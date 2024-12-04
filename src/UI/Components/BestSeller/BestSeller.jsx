@@ -43,10 +43,10 @@ const BestSeller = ({categoryData}) => {
         setMainBanner(categoryData.categories[0].image)
         setCurrentSlug(categoryData.categories[0].slug)
         
-    },[]),
+    }, []);
     useEffect(()=>{
         getBestSellerProducts(currentSlug)
-    },[currentSlug])
+    }, [currentSlug]);
     const [data,setData] = useState(categoryData)
     const bestSellerNav = ['Living Room', 'Bedroom', 'Dining Room']
    
