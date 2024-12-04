@@ -5,7 +5,7 @@ import ArrowRight from '../../Assets/icons/arrow-right.png';
 import arrowLeftRed from '../../Assets/icons/arrow-left-red.png';
 import arrowRightRed from '../../Assets/icons/arrow-right-red.png';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-
+import { url } from '../../utils/api';
 // Mobile view banner images
 import sliderImageOne from '../../Assets/Furniture Mecca/Landing Page/Slider/sofa3.png';
 import sliderImageThree from '../../Assets/Furniture Mecca/Landing Page/Slider/sofa4.png';
@@ -21,7 +21,7 @@ const Sliderr = () => {
     const [startX, setStartX] = useState(0);
     const [currentX, setCurrentX] = useState(0);
     const [slides, setSlides] = useState([])
-    const url = 'https://fm.skyhub.pk';
+
     const handleMouseEnter = () => {
         setIsHovered(true);
     }
@@ -32,7 +32,7 @@ const Sliderr = () => {
 
     const getHomeSliderImages = async () => {
         try {
-            const response = await axios.get('https://fm.skyhub.pk/api/v1/pages/home/slider/get')
+            const response = await axios.get(`${url}/api/v1/pages/home/slider/get`)
             setSlides(response.data.homeSliders || [])
         } catch (error) {
             console.error(error);
