@@ -29,6 +29,7 @@ import BreadCrumWithProduct from '../BreadCrumWithProduct/BreadCrumWithProduct';
 import { useLocation } from 'react-router-dom';
 import CategoryShimmer from '../Loaders/Category/categoryShimmer';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { url } from '../../../utils/api';
 
 const Category = ({ title, categoryData, handleNavigate }) => {
 
@@ -79,10 +80,10 @@ const Category = ({ title, categoryData, handleNavigate }) => {
       <div className='category-cards-container'>
         {categoryData && categoryData.length > 0 ? (
           categoryData.map((item, index) => (
-            <LazyLoadImage
+            <img
               key={index}
               onClick={() => handleNavigate(item.slug, item)}
-              src={"https://fm.skyhub.pk" + item.image}
+              src={url + item.image}
               alt='img'
               effect='blur'
             />
@@ -96,10 +97,10 @@ const Category = ({ title, categoryData, handleNavigate }) => {
 
       <div className='mobile-category-cards-container'>
         {categoryData && categoryData.map((item, index) => (
-          <LazyLoadImage
+          <img
             key={index}
             onClick={() => handleNavigate(item.slug, item)}
-            src={"https://fm.skyhub.pk" + item.image2}
+            src={url + item.image2}
             alt='img'
             effect='blur'
           />

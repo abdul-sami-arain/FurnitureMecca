@@ -99,7 +99,7 @@ const Sliderr = () => {
                         <div 
                             className='slide' 
                             key={index}>
-                            <LazyLoadImage 
+                            <img 
                                 src={`${url}${slide.image_url}`} 
                                 // src={slide.img}
                                 alt={`slide ${index + 1}`}
