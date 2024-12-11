@@ -197,19 +197,19 @@ export const ProductProvider = ({ children }) => {
 
     const [allProducts, setAllProducts] = useState([]);
 
-    const fetchProductData = async () =>  {
-        try {
-            const response = await axios.get('https://fm.skyhub.pk/api/v1/products/get');
-            // Parse the JSON response
-            const data = response.data.products;
-            setAllProducts(data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
-    useEffect(() => {
-        fetchProductData()
-    }, [])
+    // const fetchProductData = async () =>  {
+    //     try {
+    //         const response = await axios.get('https://fm.skyhub.pk/api/v1/products/get');
+    //         // Parse the JSON response
+    //         const data = response.data.products;
+    //         setAllProducts(data);
+    //     } catch (error) {
+    //         console.error("Error fetching data:", error);
+    //     }
+    // };
+    // useEffect(() => {
+    //     fetchProductData()
+    // }, [])
 
     return (
         <ProductContext.Provider value={{ products, allProducts }}>

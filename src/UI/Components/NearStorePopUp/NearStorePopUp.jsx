@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState ,useEffect} from 'react'
 import './NearStorePopUp.css';
 import NearStore from '../../../Assets/icons/home.png';
 import { IoCloseOutline } from "react-icons/io5";
@@ -8,12 +8,21 @@ import AddBtn from '../../../Assets/icons/add-icon.png';
 import { MdOutlineStars } from "react-icons/md";
 import closeBtn from '../../../Assets/icons/close-btn-black.png';
 import { Link } from 'react-router-dom';
+import { useGlobalContext } from '../../../context/GlobalContext/globalContext';
 
 const NearStorePopUp = ({isOpen, setIsOpen, handleCloseNearBy}) => {
+
+    const {savedInfo,fetchAllstores,stores} = useGlobalContext();
+
     const [storeOpenIndex, setOpenStoreIndex] = useState(-1);
     const handleStoreHoursDetails = (index) => {
         setOpenStoreIndex(storeOpenIndex === index ? -1 : index)
     };
+    useEffect(()=>{
+        fetchAllstores();
+    },[])
+
+
 
     const storeDetailsData = [
         {
@@ -179,16 +188,16 @@ const NearStorePopUp = ({isOpen, setIsOpen, handleCloseNearBy}) => {
             <div className='pop-up-single-city-card'>
                 <div className='pop-up-single-city-cart'>
                     <img src={NearStore} alt='near' />
-                    <h3>Your Store</h3>
+                    <h3>Your Store {stores.length}</h3>
                 </div>
-                {storeDetailsData.map((items, index) => {
+                { stores?.map((items, index) => {
                     return <div key={index}  >
                             <div className={`pop-up-city-and-distance ${storeOpenIndex === index ? 'rotate-btn' : ''}`}>
                             <span>
                                 <img src={AddBtn} alt='add' onClick={() => handleStoreHoursDetails(index)} />
                                 <h3>{items.city}</h3>
                             </span>
-                            <p> {items.miles} </p>
+                            <p> {items.distance} </p>
                         </div>
                         <div className='pop-up-store-open-time'>
                     <p>{items.openUntil}</p>
@@ -197,18 +206,17 @@ const NearStorePopUp = ({isOpen, setIsOpen, handleCloseNearBy}) => {
                     </span>
                 </div>
                 <div className='pop-up-complete-address'>
-                    <p>{items.address}</p>
-                    <p>{items.addressCity}</p>
-                    <p><span>Call</span> {items.call}</p>
-                    <Link to={items.outletLink}>{items.outlet}</Link>
-                    <Link to={items.directionLink}>{items.direction}</Link> 
+                    <p>{items.address_1}</p>
+                    <p><span>Call</span> {items.phone}</p>
+                    {/* <Link to={items.outletLink}>{items.outlet}</Link>
+                    <Link to={items.directionLink}>{items.direction}</Link>  */}
                 </div>
                 <div className={`pop-up-store-open-days-and-time ${storeOpenIndex === index ? 'open-store' : ''}`}>
                     <Link to={items.appointmentLink}>{items.appointment}</Link>
                     <div className='store-hours-detail'>
                         <p>{items.openHours}</p>
                         <div className='store-hours'>
-                        {items.hours && items.hours.map((hoursItem, index) => {
+                        {items.timings && items.timings.map((hoursItem, index) => {
                             return <p key={index}> <span>{hoursItem.day}</span> <span>{hoursItem.time}</span> </p>
                         })}
                         </div>

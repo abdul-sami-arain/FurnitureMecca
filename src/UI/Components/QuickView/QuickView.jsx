@@ -27,6 +27,8 @@ const QuickView = ({ setQuickViewProduct, stars , quickViewClose}) => {
         increamentQuantity, 
         decreamentQuantity, 
         removeFromCart, 
+        addToCart0,
+        cartProducts
     } = useCart();
     const [cartSection, setCartSection] = useState(false);
     const [viewDetails, setViewDetails] = useState(null)
@@ -76,6 +78,7 @@ const QuickView = ({ setQuickViewProduct, stars , quickViewClose}) => {
         setCartSection(true);
         // console.log("clicked product", product)
         addToCart(product, quantity, isProtectionCheck);
+        addToCart0(product,variableProductData,0)
         // console.log("cart data", cart)
     }
 
@@ -83,12 +86,31 @@ const QuickView = ({ setQuickViewProduct, stars , quickViewClose}) => {
     const imagesLenght = setQuickViewProduct.images && setQuickViewProduct.images.length;
     const [quantity, setQuantity] = useState(searchProductOnCart !== undefined ? searchProductOnCart.product.quantity : 1)
 
+    const [variableProductData,setVariableData] = useState();
+
     const increaseLocalQuantity = () => {
         setQuantity(quantity + 1);
     }
     const decreaseLocalQuantity = () => {
         setQuantity(quantity - 1);
     }
+
+    useEffect(()=>{console.log(setQuickViewProduct,"here is product data")},[])
+
+    const [selectedVariationUid, setSelectedVariationUid] = useState(null);
+    const handleVariationSelected = (uid) => {
+        setSelectedVariationUid(uid);
+        console.log(uid,"here is slected uid")
+    };
+
+    useEffect(()=>{
+        const searchProductInVariation = setQuickViewProduct?.variations?.find((item) => item.uid === selectedVariationUid)
+        setVariableData(searchProductInVariation);
+        console.log(searchProductInVariation,"here is variation data")
+    },[selectedVariationUid])
+
+    
+
 
 
     return (
@@ -113,32 +135,43 @@ const QuickView = ({ setQuickViewProduct, stars , quickViewClose}) => {
                         <img src={arrowLeft} alt='left' />
                     </button>
                     <div className="quick-view-slider-container">
-                        <div className="quick-view-slider-wrapper" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+                       {setQuickViewProduct?.type==="simple"? <div className="quick-view-slider-wrapper" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
                             {setQuickViewProduct.images && setQuickViewProduct.images.map((image, index) => (
                                 <img key={index} src={`${url}${image.image_url}`} alt={`Slide ${index + 1}`} />
                             ))}
-                        </div>
+                        </div>:
+                        <div className="quick-view-slider-wrapper" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+                        {variableProductData?.images && variableProductData?.images?.map((image, index) => (
+                            <img key={index} src={`${url}${image.image_url}`} alt={`Slide ${index + 1}`} />
+                        ))}
+                    </div>
+                        }
                     </div>
                     <button className={`quick-view-arrow quick-view-right ${currentIndex === imagesLenght - 1 ? 'disabled' : ''}`} onClick={handleNext}>
                         <img src={arrowRight} alt='right' />
                     </button>
                 </div>
                 <div className='quick-view-variations'>
-                    {/* {setQuickViewProduct.colorVariation && setQuickViewProduct.colorVariation.map((item, index) => (
-                    <div className='quick-view-var-one'>
-                        <img src={imgVariantOne} alt='variation' />
-                        <p>{item.color}</p>
-                    </div>
-                ))} */}
-                    <QuickViewVariations attributes={setQuickViewProduct.attributes} />
+                    <QuickViewVariations default_uid={setQuickViewProduct.default_uid} attributes={setQuickViewProduct.attributes} productData={setQuickViewProduct} variations={setQuickViewProduct.variations} onChangeVar={handleVariationSelected} />
                 </div>
             </div>
             {/* <h3 className='quick-view-price'>{formatedQuickViewProductPrice}</h3> */}
-            {
-                setQuickViewProduct.sale_price === "" ?
+           {setQuickViewProduct.type==="simple"? <>
+           {
+                setQuickViewProduct.sale_price === "0" ?
                     <h3 className='-quick-view-product-price-tag'>{formatePrice(setQuickViewProduct.regular_price)}</h3> :
                     <h3 className='quick-view-product-price-tag'> <del>{formatePrice(setQuickViewProduct.regular_price)}</del>  {formatePrice(setQuickViewProduct.sale_price)}</h3>
             }
+           
+           </>:
+           <>
+           {
+                variableProductData?.sale_price === "0" ?
+                    <h3 className='-quick-view-product-price-tag'>{formatePrice(variableProductData?.regular_price)}</h3> :
+                    <h3 className='quick-view-product-price-tag'> <del>{formatePrice(variableProductData?.regular_price)}</del>  {formatePrice(variableProductData?.sale_price)}</h3>
+            }
+           
+           </>}
             <div className='quick-view-add-item-or-cart-btn'>
                 <div className='quick-view-add-or-minus-item'>
                     <button onClick={decreaseLocalQuantity}>
@@ -164,14 +197,14 @@ const QuickView = ({ setQuickViewProduct, stars , quickViewClose}) => {
                             </button>
                         </div>
                         <div className={`quick-view-details ${viewDetails === index ? 'show-details' : ''}`}>
-                            <p>{items.para}</p>
+                           <p dangerouslySetInnerHTML={{ __html: items.para }} />
                         </div>
                     </div>
                 ))}
 
             </div>
             <CartSidePannel
-                cartData={cart}
+                cartData={cartProducts}
                 addToCartClicked={cartSection}
                 setAddToCartClick={setCartSection}
                 handleCartSectionClose={handleCartSectionClose}

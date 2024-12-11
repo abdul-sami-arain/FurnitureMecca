@@ -32,6 +32,7 @@ const Products = ({productArchiveHading}) => {
     // const {products} = useProducts();
     const {
         cart, 
+        cartProducts,
         addToCart, 
         cartSectionOpen, 
         setCartSectionOpen, 
@@ -608,7 +609,7 @@ const Products = ({productArchiveHading}) => {
 
         {/* Cart Side Section */}
         <CartSidePannel 
-            cartData={cart}
+            cartData={cartProducts}
             addToCartClicked={addToCartClicked}
             handleCartSectionClose={handleCartSectionClose} 
             removeFromCart={removeFromCart}

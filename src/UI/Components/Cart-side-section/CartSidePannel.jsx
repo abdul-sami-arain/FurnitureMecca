@@ -6,9 +6,14 @@ import cartBlack from '../../../Assets/icons/cart-bag-new.png';
 import minusBtn from '../../../Assets/icons/minus-white.png';
 import plusBtn from '../../../Assets/icons/plus-white.png';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../../../context/cartContext/cartContext';
 
 const CartSidePannel = ({cartData, addToCartClicked, setAddToCartClick, handleCartSectionClose, removeFromCart,decreamentQuantity, increamentQuantity}) => {
     // console.log("Card Panel Data", cartData)
+    const { isCartProtected,
+        isProfessionalAssembly,
+        handleCartProtected,
+        handleCartAssembly,} = useCart()
     const [singleCart, setSingleCart] = useState(cartData)
     const navigate = useNavigate()
     const handleCLoseCartPanel = () => {
@@ -16,6 +21,22 @@ const CartSidePannel = ({cartData, addToCartClicked, setAddToCartClick, handleCa
         navigate(`/add-to-cart`)
         
     }
+    const [isCheck, setIsCheck] = useState({});
+  
+    const handleCheckboxCheck = (index) => {
+      setIsCheck((prev) => ({
+        ...prev,
+        [index]: !prev[index], // Toggle the checked state
+      }));
+      // setIsCheck(index);
+      console.log("checked value", isCheck)
+    }
+    const cartSummeryCheckData = [
+      { type: 'checkbox', label: 'Professional Assembly (+ $210)', detail: 'Use professional assembly for all products and save up to $80' },
+      { type: 'checkbox', label: 'Elite Platinum Furniture Protection(+ $199)', detail: 'Use professional assembly for all products and save up to $80' }
+    ]
+  
+    
     // console.log("single cart state: ", singleCart)
     return (
     <div 
@@ -32,27 +53,57 @@ const CartSidePannel = ({cartData, addToCartClicked, setAddToCartClick, handleCa
                 <div className='cart-section-heading-div'>
                     <div className='cart-side-section-cart-bag-div'>
                         <img src={cartBlack} alt='cart icon' />
-                        <p className='cart-side-panel-item-count'>{(cartData.length)}</p>
+                        <p className='cart-side-panel-item-count'>{(cartData?.products?.length)}</p>
                     </div>
                     <p>Your Cart </p>
                 </div>
                 <div className='cart-section-products'>
-                    {cartData && cartData.map((items, index) => {
-                        return  <CartSideSection
-                            key={items.product.uid}
-                            handleItemRemove={() => removeFromCart(items.product.uid)}
+                    {cartData && cartData?.products?.map((items, index) => {
+                        return <CartSideSection
+
+                            key={items.product_uid}
+                            attributes={items.attributes}
+                            handleItemRemove={() => removeFromCart(items.isVariable===1?items.variation_uid:items.product_uid,items.isVariable===1)}
                             closeBtn={closeBtn}
-                            productTitle={items.product.name}
-                            mainImage={items.product.image}
-                            priceTag={items.product.regular_price}
-                            decreamentQuantity={() => decreamentQuantity(items.product.uid)}
+                            productTitle={items.name}
+                            mainImage={items.image}
+                            priceTag={items.regular_price}
+                            decreamentQuantity={() => decreamentQuantity(items.isVariable===1?items.variation_uid:items.product_uid,items.isVariable===1)}
                             minusBtn={minusBtn}
-                            quantity={items.product.quantity}
-                            increamentQuantity={() => increamentQuantity(items.product.uid)}
+                            quantity={items.quantity}
+                            increamentQuantity={() => increamentQuantity(items.isVariable===1?items.variation_uid:items.product_uid,items.isVariable===1)}
                             plusBtn={plusBtn}
+                            sale_price={items.sale_price}
+                            regular_price={items.regular_price}
+                            type={items.type}
+                            isProtected = {items.is_protected}
                         />
                     })}
                 </div>
+                <div className='proffesional-assembly-check-sec'>
+                <label className='order-summary-proffesional-check-item-label'>
+                  <input
+                    type="checkbox"
+                    className='order-summary-checkbox'
+                    checked={isProfessionalAssembly}
+                    onChange={() => handleCartAssembly()}
+                  />
+                  Professional Assembly (+ $210)
+                </label>
+                <p className='order-summary-proffesional-check-item-detail'>Use professional assembly for all products and save up to $80</p>
+              </div>
+              <div className='proffesional-assembly-check-sec'>
+                <label className='order-summary-proffesional-check-item-label'>
+                  <input
+                    type="checkbox"
+                    className='order-summary-checkbox'
+                    checked={isCartProtected}
+                    onChange={() => handleCartProtected()}
+                  />
+                  Elite Platinum Furniture Protection(+ $210)
+                </label>
+                <p className='order-summary-proffesional-check-item-detail'>Use professional assembly for all products and save up to $80</p>
+              </div>
                 <div className='cart-side-section-buttons'>
                     <div className='cart-section-view-cart-and-checkout-btn'>
                         <button  className='cart-side-section-view-cart' onClick={handleCLoseCartPanel}>

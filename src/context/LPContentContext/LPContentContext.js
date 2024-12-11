@@ -10,6 +10,7 @@ export const LPContentProvider = ({ children }) => {
     const [landingPageCategories,setLandingPageCategories] = useState([]);
     const [landingPageFOEB,setLandingPageFOEB] = useState([]);
     const postData = async () => {
+       if (data===null) {
         try {
           const response = await fetch(`${url}/api/v1/content1/get`, {
             method: 'GET',
@@ -27,6 +28,9 @@ export const LPContentProvider = ({ children }) => {
         } finally {
           setLoading(false);
         }
+       } else {
+        
+       }
       };
 
 

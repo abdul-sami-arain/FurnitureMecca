@@ -18,6 +18,7 @@ import { useCart } from '../../../context/cartContext/cartContext'
 import ProductCardShimmer from '../../Components/Loaders/productCardShimmer/productCardShimmer'
 import { useList } from '../../../context/wishListContext/wishListContext'
 import { toast } from 'react-toastify'
+import { useGlobalContext } from '../../../context/GlobalContext/globalContext'
 
 
 
@@ -44,6 +45,8 @@ const Cart = () => {
   const [isCouponOpen, setIsCouponOpen] = useState(false);
   const [isCheck, setIsCheck] = useState({});
 
+  const { setAllShippingMethods,shippingMethods,setShippingMethods,shippingLoader,setShippingLoader,info, updateLocationData, zipCode, setZipCode, handleInputChange, handleButtonClick  } = useGlobalContext();
+
   const handleCheckboxCheck = (index) => {
     setIsCheck((prev) => ({
       ...prev,
@@ -52,12 +55,11 @@ const Cart = () => {
     // setIsCheck(index);
     console.log("checked value", isCheck)
   }
-  const cartSummeryCheckData = [
-    { type: 'checkbox', label: 'Professional Assembly (+ $210)', detail: 'Use professional assembly for all products and save up to $80' },
-    { type: 'checkbox', label: 'Elite Platinum Furniture Protection(+ $210)', detail: 'Use professional assembly for all products and save up to $80' }
-  ]
 
-  const { cart } = useCart();
+  const { cart,calculateTotalPrice,subTotal ,savings,isCartProtected,
+    isProfessionalAssembly,
+    handleCartProtected,
+    handleCartAssembly,} = useCart();
   const subTotalOfAllProducts = cart.map(item => item.product.sub_total);
   // console.log("sub total of products", subTotalOfAllProducts)
   const subtotal = subTotalOfAllProducts.reduce((acc, value) => acc + value, 0)
@@ -78,7 +80,7 @@ const Cart = () => {
 
   const grandTotal = subtotal + protectionPrice + assemblyPrice + shipping + taxPrice - discountPrice
   const orderPriceDetails = [
-    { title: 'Subtotal', price: formatePrice(subtotal) },
+    { title: 'Subtotal', price: formatePrice(subTotal) },
     { title: 'Protection plan', price: formatePrice(protectionPrice) },
     { title: 'Professional Assembly', price: formatePrice(assemblyPrice) },
     {title: 'Shipping', price: formatePrice(shipping)},
@@ -105,6 +107,7 @@ const Cart = () => {
   }
   useEffect(() => {
     getLatestProducts();
+    setAllShippingMethods();
   }, []);
 
   const productsUids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -203,6 +206,19 @@ const Cart = () => {
         }
     }
 
+
+    const [selectedValue, setSelectedValue] = useState("");
+
+    const options = [
+      { id: 1, label: "Delivery & Setup",description:"Package is delivered inside the house and set up by our Professional Crew without mistake and hassle", value: "Delivery & Setup" },
+      { id: 2, label: "Delivery & No Setup",description:"Package is delivered on your front door but setup is not included", value: "Delivery & No Setup" },
+      { id: 3, label: "Local Pickup",description:"Come to your designated Furniture Mecca franchise and get your furniture packed and ready for you", value: "Local Pickup" },
+    ];
+  
+    const handleChange = (e) => {
+      setSelectedValue(e.target.value);
+    };
+
   return (
     <div className='cart-main-container'>
       <CartMainImage />
@@ -213,22 +229,32 @@ const Cart = () => {
 
         <div className='cart-order-summery-section'>
           <div className='cart-order-summery-inner-section'>
-            <h3 className='cart-order-summary-heading'>Order Summary (3)</h3>
+            <h3 className='cart-order-summary-heading'>Order Summary</h3>
             <p className='cart-order-summary-sub-title'>This order qualifies for free shipping</p>
-            {cartSummeryCheckData.map((item, index) => (
-              <div className='proffesional-assembly-check-sec'>
-                <label key={index} className='order-summary-proffesional-check-item-label'>
+            <div className='proffesional-assembly-check-sec'>
+                <label className='order-summary-proffesional-check-item-label'>
                   <input
-                    type={item.type}
+                    type="checkbox"
                     className='order-summary-checkbox'
-                    checked={!!isCheck[index]}
-                    onChange={() => handleCheckboxCheck(index)}
+                    checked={isProfessionalAssembly}
+                    onChange={() => handleCartAssembly()}
                   />
-                  {item.label}
+                  Professional Assembly (+ $210)
                 </label>
-                <p className='order-summary-proffesional-check-item-detail'>{item.detail}</p>
+                <p className='order-summary-proffesional-check-item-detail'>Use professional assembly for all products and save up to $80</p>
               </div>
-            ))}
+              <div className='proffesional-assembly-check-sec'>
+                <label className='order-summary-proffesional-check-item-label'>
+                  <input
+                    type="checkbox"
+                    className='order-summary-checkbox'
+                    checked={isCartProtected}
+                    onChange={() => handleCartProtected()}
+                  />
+                  Elite Platinum Furniture Protection(+ $199)
+                </label>
+                <p className='order-summary-proffesional-check-item-detail'>Use professional assembly for all products and save up to $80</p>
+              </div>
 
             <div className='cart-order-summary-price-details'>
               {filteredOrderPriceDetails.map((price, index) => (
@@ -240,7 +266,7 @@ const Cart = () => {
               <div className='cart-order-summary-zip-code'>
                 <span className='cart-order-summary-zip-code-heading'>
                   <p>Deliver to:</p>
-                  <h3 onClick={handleZipInput}>Austin-123 <IoIosArrowDown className={`cart-order-summary-zip-arrow ${isZipUpdateOpen ? 'cart-order-summary-zip-arrow-rotate' : ''}`} size={20} /> </h3>
+                  <h3 onClick={handleZipInput}>{info?.locationData.state} {info?.locationData.stateCode} <IoIosArrowDown className={`cart-order-summary-zip-arrow ${isZipUpdateOpen ? 'cart-order-summary-zip-arrow-rotate' : ''}`} size={20} /> </h3>
                 </span>
                 <div className={`cart-order-summary-zip-code-input-div ${isZipUpdateOpen ? 'show-zip-code-update-input' : ''}`}>
                   <div className='cart-order-summary-zip-code-input-and-button'>
@@ -248,10 +274,37 @@ const Cart = () => {
                       type='text' 
                       placeholder='Zip Code' 
                       className='cart-summary-update-zip-input'
+                      value={zipCode}
+                      onChange={handleInputChange} 
                     />
-                    <button className='cart-summary-update-zip-btn'>Update</button>
+                    <button className='cart-summary-update-zip-btn' onClick={async () => {await handleButtonClick();} }>Update</button>
                   </div>
                 </div>
+              </div>
+
+              <div className="delivery-option-container">
+                <p className='delivery-opt-heading' >Delivery Options :</p>
+              {shippingMethods['shippingMethods'] &&  shippingMethods['shippingMethods']?.map((option) => (
+        <label key={option.id} style={{ display: "flex",   alignItems:"flex-start",
+          justifyContent:"flex-start", margin: "5px 0",gap:"10px" }}>
+          <input
+            type="radio"
+            name="options"
+            value={option.id}
+            checked={selectedValue === option.id}
+            onChange={handleChange}
+            style={{marginTop:"5px"
+            }}
+          />
+            <div style={{display:"flex",flexDirection:"column",
+              alignItems:"flex-start",
+              justifyContent:"center"
+            }}>
+            <p className='delivery-option-container-label'>{option.name}</p>
+            <p className='delivery-option-container-description'>{option.name}</p>
+            </div>
+        </label>
+      ))}
               </div>
               <div className='order-summary-coupon-div'>
                 <p onClick={handleCouponInput}>Add Coupon Code <IoIosArrowDown className={`cart-order-summary-coupon-arrow ${isCouponOpen ? 'cart-order-summary-coupon-arrow-rotate' : ''}`} size={20} /></p>
@@ -271,7 +324,7 @@ const Cart = () => {
               </div>
               <div className='cart-order-summary-price-detail-save-discount'>
                 <p>You Save</p>
-                <p>{formatePrice(discountPrice)}</p>
+                <p>{formatePrice(savings)}</p>
               </div>
             </div>
 

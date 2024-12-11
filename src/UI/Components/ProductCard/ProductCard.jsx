@@ -261,7 +261,7 @@ const ProductCard = ({
 
 
                     {
-                        sale_price === "" ?
+                        sale_price === "0" ?
                             <h3 className='product-price-del'>${priceTag}</h3> :
                             <h3 className='product-price-tag'> <del className='product-del-price-with-sale-price'>${priceTag}</del>  ${sale_price}</h3>
                     }

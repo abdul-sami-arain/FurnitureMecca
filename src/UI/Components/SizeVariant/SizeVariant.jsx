@@ -11,7 +11,6 @@ const SizeVariant = ({
     handleSelectColor,
     handleSelectVariation,
     handleSelectedVariationData,
-    
 }) => {
     const { selectedVariationData, setSelectedVariationData } = useProductPage();
     const [colorVariation, setColorVariation] = useState();
@@ -169,26 +168,24 @@ const SizeVariant = ({
                             <h3 className="attribute-heading">
                                 {selectedColorName ? selectedColorName : attribute.name}
                             </h3>
-                            <div className="attribute-variations">
-                                {attribute.options.map((option, index) => (
-                                    <div className="attribute-single-color" key={index}>
-                                        <div
-                                            className="attribute-color-variation-box"
-                                            onClick={() => handleClickColor(attribute.name, option.value, option.name)}
-                                            style={{
-                                                backgroundColor: option.value,
-                                                border:
-                                                    selectedColor === option.value
-                                                        ? `1px solid ${option.value}`
-                                                        : 'none',
-                                                boxShadow:
-                                                    selectedColor === option.value
-                                                        ? `inset 0 0 0 2px #FFFF`
-                                                        : '',
-                                            }}
-                                        ></div>
-                                    </div>
-                                ))}
+                            <div className="attribute-variations" style={{height:"60px"}}>
+                            {attribute.options.map((option, index) => (
+    <div className="attribute-single-color" key={index}>
+        <div
+            className={`attribute-color-variation-box ${
+                selectedSelectAttrs[attribute.name] === option.value
+                    ? 'selected'
+                    : ''
+            }`}
+            onClick={() => handleClickColor(attribute.name, option.value, option.name)}
+            style={{
+                backgroundColor: option.value,
+            }}
+        ></div>
+        <p className='quick-view-atribute-option-name'>{option.name}</p>
+    </div>
+))}
+
                             </div>
                         </div>
                     ) : attribute.type === 'image' ? (

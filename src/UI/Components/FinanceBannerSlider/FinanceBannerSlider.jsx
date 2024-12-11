@@ -4,14 +4,14 @@ import paypalBanner from '../../../Assets/Furniture Mecca/Landing Page/sale bann
 import moveForword from '../../../Assets/Furniture Mecca/Landing Page/sale banner/New-Financing-AAF-1.jpg';
 import axios from "axios";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { url } from "../../../utils/api";
 
 
 function FinanceBannerSlider() {
     const [images, setIMages] = useState([])
-    const url = 'https://fm.skyhub.pk';
     const getFinanceBannerImagesFRomApi = async () => {
         try {
-            const response = await axios.get('https://fm.skyhub.pk/api/v1/pages/home/finance-slider/get');
+            const response = await axios.get(`${url}/api/v1/pages/home/finance-slider/get`);
             // console.log("finance images", response.data.homeSliders)
             setIMages(response.data.homeSliders)
         } catch (error) {

@@ -103,40 +103,6 @@ const Home = () => {
   }, [])
 
 
-  const productCardData = [
-    {
-      heading: 'Tuxedo', productImageHeading: 'tuxedo Power Reclining Sofa',
-      productImagePrice: '$999', productImageAbout: "Furniture Mecca everyday low price",
-      btnText: 'Shop Tuxedo', img: tuxedoChair, productLink: '#',
-      para: `With smooth, comfy seating, built-in charging ports AND cupholders, 
-        my Tuxedo collection is dressed to impress! the viking`
-    },
-    {
-      heading: 'Viking', btnText: 'Shop Viking', productImageHeading: 'Viking Power Reclining Sofa',
-      productImagePrice: '$999', productImageAbout: "Furniture Mecca everyday low price", img: vikingImage,
-      para: `On-trend and feature-packed with storage, charging ports, 
-        and a reading light? There’s no better place to relax than Viking!`
-    },
-    {
-      heading: 'Journey', btnText: 'Shop Journey', productImageHeading: 'Journey Power Reclining Sofa',
-      productImagePrice: '$999', productImageAbout: "Furniture Mecca everyday low price", img: tuxedoChair,
-      para: `Customize your journey to comfort town with this collection’s adjustable 
-        headrest, zero-gravity recline, and charging ports!`
-    },
-    {
-      heading: 'Journey', btnText: 'Shop Journey', productImageHeading: 'Journey Power Reclining Sofa',
-      productImagePrice: '$999', productImageAbout: "Furniture Mecca everyday low price", img: tuxedoChair,
-      para: `Customize your journey to comfort town with this collection’s adjustable 
-        headrest, zero-gravity recline, and charging ports!`
-    },
-    {
-      heading: 'Journey', btnText: 'Shop Journey', productImageHeading: 'Journey Power Reclining Sofa',
-      productImagePrice: '$999', productImageAbout: "Furniture Mecca everyday low price", img: tuxedoChair,
-      para: `Customize your journey to comfort town with this collection’s adjustable 
-        headrest, zero-gravity recline, and charging ports!`
-    },
-  ]
-
 
   const navigate = useNavigate();
 

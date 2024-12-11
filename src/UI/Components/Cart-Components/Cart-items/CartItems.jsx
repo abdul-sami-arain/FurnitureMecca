@@ -16,6 +16,11 @@ import guardIcon from '../../../../Assets/icons/guard-icon.png';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../../../context/cartContext/cartContext';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import check from "../../../../Assets/check.png";
+import { IoEye } from "react-icons/io5";
+import { IoInformationCircle } from "react-icons/io5";
+
+
 
 const CartItems = ({
     cartProductName, 
@@ -28,7 +33,6 @@ const CartItems = ({
     productData,
     cartProductTitle, 
     cartProductTotalPrice, 
-    cartSingleProductPrice, 
     isCartOpen, 
     onlyMobile, 
     productColor, 
@@ -38,16 +42,26 @@ const CartItems = ({
     productsLength, 
     handleIncreament, 
     handleDecreament, 
-    handleTotalPrice
+    handleTotalPrice,
+    attributes,
+    sale_price,
+    regular_price,
+    isProtected,
+    removeProtection,
+    addProtection
     }) => {
-        const {addSingleProtection, removeProtection} = useCart()
+        const {addSingleProtection,eachProtectionValue,isCartProtected,cartProducts} = useCart()
         const [saveForLeter, setSaveForLeter] = useState(false)
-        const formatedSinglePrice = Intl.NumberFormat('en-us', {
+        const formatedSalePrice = Intl.NumberFormat('en-us', {
             style: 'currency',
             currency: 'USD'
-        }).format(cartSingleProductPrice)
+        }).format(sale_price)
+        const formatedRegularPrice = Intl.NumberFormat('en-us', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(regular_price)
 
-        const productTotalPrice = cartSingleProductPrice * quantity;
+        const productTotalPrice = sale_price!=="0"? (sale_price * quantity)+ (isCartProtected? 0 : (isProtected===1?eachProtectionValue:0)): (regular_price * quantity) + (isCartProtected? 0 : (isProtected===1?eachProtectionValue:0)) ;
 
         const formatedTotalPrice = Intl.NumberFormat('en-us', {
             style: 'currency',
@@ -67,10 +81,17 @@ const CartItems = ({
             {type: 'button', title: 'Yes Protect', style: 'protect-yes-protect', secondStyle: 'selected-yes-protect'},
         ]
 
-        const [isProtectionClicked, setIsProtectionClicked] = useState();
+        const [isProtectionClicked, setIsProtectionClicked] = useState(isProtected===0?"no-thanks":"yes-protect");
         const handleProtectOrNotButtonClicked = (value) => {
             setIsProtectionClicked((prevValue) => prevValue === value ? null : value)
         }
+
+        const [isOpen, setIsOpen] = React.useState(false);
+
+const toggleDetails = () => {
+    setIsOpen(prev => !prev);
+};
+
 
         
     return (
@@ -91,7 +112,6 @@ const CartItems = ({
                     <p>{cartProductColor}</p>
                     <p>{cartProductTitle}</p>
                     <div className='price-and-count'>
-                        <p>{cartSingleProductPrice}</p>
                         <div className='product-count'>
                             <button onClick={handleDecreament}>
                                 <img src={minusBtn} alt='minus' />
@@ -124,44 +144,62 @@ const CartItems = ({
                 </button>
                 <div className='desktop-name-and-single-price'>
                     <h3>{cartProductName}</h3>
-                    <p className='desktop-product-extra-info'>{formatedSinglePrice}</p>
-                    <p className='desktop-product-extra-info'>Table & 4 Chairs</p>
+                    {/* <p className='desktop-product-extra-info'>{formatedSinglePrice}</p> */}
+                    {attributes && attributes.map((item,index)=>{
+                        return(
+                            <p className='desktop-product-extra-info'>{item?.options[0].name}</p>
+                        )
+                    })}
+                     <div className='cart-side-section-price-and-count'>
+                    <p><del style={{
+                        color:"#989898"
+                    }} >{formatedRegularPrice}</del></p>
+                    <p>{formatedSalePrice}</p>
+                   
+                    
+                </div>
                     {/* <p className='desktop-product-extra-info'>Yes, Protect it (+$99)</p> */}
  
                     <div className='desktop-card-protection-div'>
-                        <div className='guard-and-heading'>
-                            <LazyLoadImage effect='blur' src={guardIcon} alt='guard' className='protection-guard-icon' />
-                            <div className='guard-title-and-details'>
-                                <h3 className='protection-guard-title'>Platinum Elite Furniture</h3>
-                                <span className='protection-details-and-message'>
-                                    <Link className='protection-details'>Details</Link>
-                                    <p className='protection-price-message'>Price shown in summary</p>
-                                </span>
-                            </div>
-                        </div>
-                        <div className='protection-btns-accept-and-cancel'>
-                            {/* {protectOrNotButtons.map((items, index) => (
-                                <button 
-                                    key={index}
-                                    className={`protection-buttons ${items.style} ${isProtectionClicked === index ? items.secondStyle : ''}`}
-                                    onClick={() => handleProtectOrNotButtonClicked(index)}
-                                >
-                                    {items.title}
-                                </button>
-                            ))} */}
+                    <div className='guard-and-heading'>
+    <img effect='blur' src={guardIcon} alt='guard' className='protection-guard-icon' />
+    <div className='guard-title-and-details'>
+        <div className='guard-title-and-details-head'>
+            <h3 className='protection-guard-title'>Platinum Elite Furniture</h3>
+            <IoInformationCircle className='eye_icon' onClick={toggleDetails} />
+        </div>
+        <span className='protection-details-and-message'>
+            <p className='protection-price-message'>
+                {(cartProducts.is_all_protected === 1 || isProtected===1)? "Price shown in summary" : "$99"}
+            </p>
+            <div className={`detail-container ${isOpen ? 'open' : ''}`}>
+                <p className='protection-price-message detail'>
+                    Our Elite Furniture Protection Plan covers accidental stains and damage to your new fabric, leather, and wood (and other hard surfaces) furniture.
+                </p>
+                <Link>Details</Link>
+            </div>
+        </span>
+    </div>
+</div>
+
+                       
+                       {cartProducts.is_all_protected ===1 ? <div className="protection-all-protected">
+                        <img src={check} alt="" srcset="" />
+                        <p>Protection Applied</p>
+                        </div>: <div className='protection-btns-accept-and-cancel'>
                             <button 
                                 className={`protection-buttons protect-no-thanks ${isProtectionClicked === 'no-thanks' ? 'select-not-protection' : ''}`}
-                                onClick={() => {handleProtectOrNotButtonClicked('no-thanks'); removeProtection(productData)}}
+                                onClick={() => {handleProtectOrNotButtonClicked('no-thanks');removeProtection() }}
                             >
                                 No Thanks
                             </button>
                             <button 
                                 className={`protection-buttons protect-yes-protect ${isProtectionClicked === 'yes-protect' ? 'selected-yes-protect' : ''}`}
-                                onClick={() => {handleProtectOrNotButtonClicked('yes-protect'); addSingleProtection(productData)}}
+                                onClick={() => {handleProtectOrNotButtonClicked('yes-protect'); addProtection() }}
                             >
                                 Yes Protect it
                             </button>
-                        </div>
+                        </div>}
                     </div>
 
                     {/* <button className={`protect-product-tag ${issingleProtected ? 'protect-tick' : ''}`} onClick={handleSingleProtected}>
@@ -172,7 +210,7 @@ const CartItems = ({
 
 
 
-                    <p>{formatedTotalPrice}</p>
+                  
                 </div>
                 <div className={`desktop-quantity-and-save-for-leter ${isCartOpen ? 'hide-quantity' : ''}`}>
                     <div className='desktop-quantity'>
@@ -186,7 +224,7 @@ const CartItems = ({
                     </div>
                 </div>
                 <div className={`desktop-total-price-and-remove-item ${isCartOpen ? 'hide-total-and-remove-item' : ''}`}>
-                    <p>$ {productTotalPrice}</p>
+                    <p>{formatedTotalPrice}</p>
                     {/* <p>$ {productTotalPrice}</p> */}
                     <button className='save-for-leter' onClick={handleSaveForLeter}>
                        <img src={rotatedArrow} className={`${saveForLeter ? 'arrow-rotate' : ''}`} /> Save For Later
@@ -202,7 +240,7 @@ const CartItems = ({
                             <img src={plusCharcol} alt='plus' />
                         </button>
                     </div>
-                    <p className='cart-open-total-price'>$ {formatedTotalPrice}</p>
+                    <p className='cart-open-total-price'>{formatedTotalPrice}</p>
                     {/* <p className='cart-open-total-price'>$ {productTotalPrice}</p> */}
                 </div>
             </div>

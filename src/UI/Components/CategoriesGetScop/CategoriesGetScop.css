@@ -253,6 +253,46 @@
     }
 }
 
+
+.scroll-container{
+    height: auto;
+    width: 100%;
+    position: relative;
+}
+.carousel-primary,
+.carousel-secondary{
+    overflow: hidden;
+    white-space: nowrap;
+    position: absolute;
+}
+
+.carousel-primary img{
+    width: 100px;
+    height: auto;
+    margin-left: 20px;
+    border-radius: 10px;
+}
+.carousel-primary{
+    display: flex;
+    justify-content: space-around;
+    animation: scroll-horizontal 20s linear infinite;
+}
+.carousel-seconday{
+   
+    animation: scroll-horizontal 20s linear infinite;
+    animation-delay: 10s;
+}
+
+
+@keyframes scroll-horizontal {
+    0%{
+left: 100%;
+    }
+    100%{
+left: -100%;
+    }
+}
+
 /* mobile view styling */
 .mobile-view-get-scoop-text-and-slider{
     display: none;

@@ -29,13 +29,14 @@ import axios from 'axios';
 import { url } from '../../utils/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useGlobalContext } from '../../context/GlobalContext/globalContext';
 
 const Haider = () => {
   // const notify = () => toast()
   const [isTabMenuOpen, setIsTabMenuOpen] = useState(false);
   const [showCart, setShowCart] = useState(false)
   const { products } = useProducts()
-  const { cart, addToCart, cartSectionOpen, setCartSectionOpen, increamentQuantity, decreamentQuantity, removeFromCart, calculateTotalPrice } = useCart()
+  const { cart, addToCart, cartSectionOpen, setCartSectionOpen, increamentQuantity, decreamentQuantity, removeFromCart, calculateTotalPrice ,cartProducts} = useCart()
   const cartItemCount = cart.length
   const handleCartSectionOpen = () => {
     setShowCart(true)
@@ -218,6 +219,8 @@ const Haider = () => {
   const nearState = locationDetails.state || 'E Venango - ST';
   console.log("on header location details", locationDetails)
 
+
+  const {info} = useGlobalContext();
   return (
     <div className='haider-main-container'>
 
@@ -270,7 +273,7 @@ const Haider = () => {
                     </div>
                     <div className='searched-product-prices'>
                     {
-                      items.sale_price === "" ?
+                      items.sale_price === "0" ?
                         <h3 className='searched-product-regular-price'>${items.regular_price}</h3> :
                         <h3 className='searched-product-sale-price'> <del>${items.regular_price}</del>  ${items.sale_price}</h3>
                     }
@@ -293,7 +296,7 @@ const Haider = () => {
                 <p className='searched-selected-product-sku'>{searchedProducts?.[currentInd]?.sku?.split(':')}</p>
                 <div className='searched-selected-product-price'>
                 {
-                  searchedProducts?.[currentInd]?.sale_price === "" ?
+                  searchedProducts?.[currentInd]?.sale_price === "0" ?
                     <h3 className='searched-product-regular-price'>${searchedProducts?.[currentInd]?.regular_price}</h3> :
                     <h3 className='searched-product-sale-price'> <del>${searchedProducts?.[currentInd]?.regular_price}</del>  ${searchedProducts?.[currentInd]?.sale_price}</h3>
                 }
@@ -319,7 +322,7 @@ const Haider = () => {
               </div>
               <span className='deliver-to' onClick={handleSearchModal}>
                 <p>Deliver to</p>
-                <span>{nearZip}</span>
+                <span>{info.locationData.zipCode} {info.locationData.stateCode}</span>
               </span>
             </div>
           </div>
@@ -404,7 +407,7 @@ const Haider = () => {
         locationDetails={locationDetails}
       />
       <CartSidePannel
-        cartData={cart}
+        cartData={cartProducts}
         addToCartClicked={showCart}
         setAddToCartClick={setShowCart}
         handleCartSectionClose={handleCartSectionClose}

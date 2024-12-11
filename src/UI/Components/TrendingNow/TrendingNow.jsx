@@ -9,18 +9,18 @@ import cornerChair from '../../../Assets/Furniture Mecca/Landing Page/trending-n
 import chaisChair from '../../../Assets/Furniture Mecca/Landing Page/trending-now/chaise.png'
 import armlessChair from '../../../Assets/Furniture Mecca/Landing Page/trending-now/armless-chair.png'
 import axios from 'axios'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { url } from '../../../utils/api'
 
 const TrendingNow = () => {
 
     const [currentIndex, setCurrentIndex] = useState(0);
-    const url = 'https://fm.skyhub.pk';
     // const sliderImages = [trandinImage, trandinImage, trandinImage];
     const sliderItems = [armlessChair, cornerChair, swivalChair, slideChair, chaisChair, sofaChair]
     const [data, setData] = useState([]);
     const getTrandingProductsData = async () => {
         try {
-            const response = await axios.get('https://fm.skyhub.pk/api/v1/pages/home/trending-now/get');
+            const response = await axios.get(`${url}/api/v1/pages/home/trending-now/get`);
             // console.log('tranding data', response.data.data.sliders)
             setData(response.data.data)
         } catch (error) {

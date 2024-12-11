@@ -60,7 +60,8 @@ import Cart from "./UI/Pages/Cart/Cart";
 import Summary from "./UI/Pages/Summery/Summary";
 import Breadcrumb from "./Global-Components/BreadCrumb/BreadCrumb";
 import { ToastContainer, Zoom } from "react-toastify";
-
+import DynamicMetaTags from "./Global-Components/Helmet/Helmet";
+import { useSEOContext } from "./context/SEOcontext/SEOcontext";
 
 function App() {
   const [currentUrl, setCurrentUrl] = useState('/');
@@ -69,6 +70,7 @@ function App() {
     setCurrentUrl(location.pathname);
   }, [location]);
 
+  const {title,setTitle,description,setDescription,image,setImage} = useSEOContext();
   const categoryCardData = [
     {title: "Dining Room Sets", img: newArrivalImage, link: '#'},
     {title: "Pub Height Dining Sets", img: livingRoomImage, link: '#'},
@@ -128,6 +130,7 @@ function App() {
         <button onClick={handleClickTop} className={`scroll-to-top-button ${isVisible ? 'show-scrollTop' : ''}`}>
           <IoIosArrowUp size={30} className='lead-to-top-btn' />
         </button>
+        <DynamicMetaTags title={title} description={description} image={image} url={""} />
       </div>
   );
 }

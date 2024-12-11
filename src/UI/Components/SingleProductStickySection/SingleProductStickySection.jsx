@@ -58,7 +58,7 @@ const SingleProductStickySection = ({ productData }) => {
 
 
 
-  console.log("product data", productData)
+  // console.log("product data", productData)
   const { slug } = useParams()
   // //console.log("slug get", slug)
   const [getBySlug, setGetBySlug] = useState({})
@@ -89,7 +89,7 @@ const SingleProductStickySection = ({ productData }) => {
   const [product, setProduct] = useState(Object.keys(productData || {}).length > 0 ? productData : getBySlug)
   //console.log("product on top", product)
 
-  const { cart, addToCart, decreamentQuantity, increamentQuantity, removeFromCart, calculateTotalPrice } = useCart();
+  const { cart, addToCart, decreamentQuantity, increamentQuantity, removeFromCart, calculateTotalPrice,addToCart0,cartProducts } = useCart();
   const [cartSection, setCartSection] = useState(false);
   const [isProtectionCheck, setIsProtectionCheck] = useState(true)
 
@@ -236,7 +236,9 @@ const SingleProductStickySection = ({ productData }) => {
 
   const handleAddToCartProduct = (product) => {
     setCartSection(true);
-    addToCart(product, quantity, isProtectionCheck);
+    // console.log(product)
+    addToCart(product, quantity, !isProtectionCheck);
+    console.log(cart,"here is the products in cart")
   }
   const handleCartClose = () => {
     setCartSection(false)
@@ -411,10 +413,24 @@ const SingleProductStickySection = ({ productData }) => {
                 <Link>200 Reviews</Link>
               </div>
               {/* <h3 className='single-product-price'>${productData.productCard.priceTag}</h3> */}
-              <div className='single-product-prices'>
-                <del className='single-product-old-price'>{selectedVariationData?.regular_price ? formatePrice(selectedVariationData?.regular_price) : formatePrice(product.regular_price)}</del>
-                <h3 className='single-product-new-price'>{selectedVariationData?.sale_price ? formatePrice(selectedVariationData?.sale_price) : formatePrice(product.regular_price)}</h3>
+             {productData.type==="simple"?<>
+             {productData?.sale_price!=="0="? <div className='single-product-prices'>
+                <del className='single-product-old-price'>{formatePrice(productData?.regular_price)}</del>
+                <h3 className='single-product-new-price'>{formatePrice(productData?.sale_price)}</h3>
+              </div>: <div className='single-product-prices'>
+                <h3 className='single-product-new-price'>{formatePrice(productData.regular_price)}</h3>
               </div>
+             }
+             </> :<>
+             {selectedVariationData?.sale_price!=="0="? <div className='single-product-prices'>
+                <del className='single-product-old-price'>{formatePrice(selectedVariationData?.regular_price)}</del>
+                <h3 className='single-product-new-price'>{formatePrice(selectedVariationData?.sale_price)}</h3>
+              </div>: <div className='single-product-prices'>
+                <h3 className='single-product-new-price'>{formatePrice(product.regular_price)}</h3>
+              </div>
+             }
+             </>}
+             
               {/* <p className='single-product-installment-price-price'>$9/month for 6 months - Total {productData.productCard.priceTag} </p> */}
 
               <span className='single-product-shipping'>
@@ -450,7 +466,9 @@ const SingleProductStickySection = ({ productData }) => {
                   className={`add-to-cart-btn ${isLoading ? 'loading' : ''}`}
                   onClick={() => {
                     handleClick();
-                    handleAddToCartProduct(product)
+                    addToCart0(product,variationData,!isProtectionCheck?1:0)
+                    handleAddToCartProduct(product);
+                    
                   }
                   }>
                   {isLoading ? 'Loading...' : 'Add To Cart'}
@@ -460,14 +478,14 @@ const SingleProductStickySection = ({ productData }) => {
             <FinancingOptions />
             {product.may_also_need && product.may_also_need.length > 0 ? <AlsoNeed productsUid={product.may_also_need} /> : <></>}
 
-            <WhatWeOffer isProtected={isProtectionCheck} setIsProtected={setIsProtectionCheck} />
+            <WhatWeOffer key={"single-protection"} isProtected={isProtectionCheck} setIsProtected={setIsProtectionCheck} />
             <DeliveryOptions />
             {/* <ProductOverView /> */}
             <SingleProductFAQ description={product.description} />
           </div>
         </div>
         <CartSidePannel
-          cartData={cart}
+          cartData={cartProducts}
           addToCartClicked={cartSection}
           handleCartSectionClose={handleCartClose}
           setAddToCartClick={setCartSection}

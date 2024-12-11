@@ -334,7 +334,7 @@ const routes = (
             path="/blogs"
             element={<BlogPage />}
         />
-        <Route 
+        <Route
             path="/single-blog/:id"
             element={<SingleBlog />}
         />
@@ -357,7 +357,7 @@ const routes = (
             path="/all-stores"
             element={<StoreLocator />}
         />
-        <Route 
+        <Route
             path="/wish-list"
             element={<WishList />}
         />

@@ -17,11 +17,16 @@ import { VariationProvider } from './context/BreadCrumbContext/variationsContext
 import { LPContentProvider } from './context/LPContentContext/LPContentContext';
 import { WishListProvider } from './context/wishListContext/wishListContext';
 import { ProductPageProvider } from './context/ProductPageContext/productPageContext';
-
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SEOctxProvider } from './context/SEOcontext/SEOcontext';
+import { GlobalContextProvider } from './context/GlobalContext/globalContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <HelmetProvider>
+      <SEOctxProvider>
+        <GlobalContextProvider>
     <WishListProvider>
     <LPContentProvider>
     <OrderProvivder>
@@ -53,6 +58,9 @@ root.render(
     </OrderProvivder>
     </LPContentProvider>
     </WishListProvider>
+    </GlobalContextProvider>
+    </SEOctxProvider>
+    </HelmetProvider>
   </React.StrictMode>
 );
 
