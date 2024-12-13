@@ -2,6 +2,9 @@ import React, {useState, useRef} from 'react'
 import './ProductSlider.css';
 import ProductCard from './ProductCard/ProductCard';
 import { url } from '../../../utils/api';
+import { useNavigate } from 'react-router-dom';
+import { useSingleProductContext } from '../../../context/singleProductContext/singleProductContext';
+import { useCart } from '../../../context/cartContext/cartContext';
 
 const ProductSlider = ({cardData}) => {  
 
@@ -9,6 +12,8 @@ const ProductSlider = ({cardData}) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState(0);
   const [scrollPos, setScrollPos] = useState(0);
+
+  const navigate = useNavigate();
 
   const getPositionX = (event) => {
     return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
@@ -39,6 +44,20 @@ const ProductSlider = ({cardData}) => {
       }
     }
   };
+  const {addSingleProduct} = useSingleProductContext();
+  const {addToCart} = useCart()
+
+  const handleCardClicked = (item) => {
+    // console.log("item clicked", item)
+    // addSingleProduct(item)
+    addSingleProduct(item)
+    addToCart(item)
+    navigate(`/single-product/${item.slug}`, {state: item})
+    // addQuantityIntoProduct(item.uid, setAllProducts, allProducts)
+    // console.log("product uid", item.uid)
+    // console.log("added quantity into payload", allProducts)
+
+}
 
     return (
       <div className="products-slider-main-container">
@@ -54,8 +73,9 @@ const ProductSlider = ({cardData}) => {
           onTouchMove={drag}
         >
         {cardData.map((item, index) => {
-            return <ProductCard key={index} 
-                      img={url+item.images[0].image_url} 
+            return <ProductCard key={index}
+                      productData={item} 
+                      img={url+item.images[1].image_url} 
                       heading={item.name} 
                       para={item.para} 
                       btnTxt={"Purchase Now"} 
@@ -63,6 +83,8 @@ const ProductSlider = ({cardData}) => {
                       productImagePrice={"$"+ item.sale_price}
                       productImageAbout={""}
                       productLink={""}
+                      index={index}
+                      handleCardClicked={() => handleCardClicked(item)}
                     />
         })}
         </div>

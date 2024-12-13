@@ -58,7 +58,7 @@ const Haider = () => {
     { name: "Accent Furniture / Rugs", link: '/accent-furniture-category', hasDropdown: true },
     { name: "Small Spaces", link: '/small-spaces', hasDropdown: true },
     { name: "Outlets", link: '/sale-category', hasDropdown: true },
-    { name: "Labor Day Sale", link: '/labor-day-sale', hasDropdown: true },
+    { name: "Holiday Sale", link: '/holiday-sale', hasDropdown: true },
 
   ]
   const [nearStorePopUp, setNearStorePopUp] = useState(false)

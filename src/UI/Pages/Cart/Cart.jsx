@@ -40,12 +40,18 @@ function SampleNextArrow(props) {
   )
 }
 
+
+
+
+
 const Cart = () => {
+  // const [selectedShippingMethods,setSelectedShippingMethods] = useState([]);
   const [isZipUpdateOpen, setIsZipUpdateOpen] = useState(false)
   const [isCouponOpen, setIsCouponOpen] = useState(false);
   const [isCheck, setIsCheck] = useState({});
+  const [isStarted, setIsStarted] = useState(false);
 
-  const { setAllShippingMethods,shippingMethods,setShippingMethods,shippingLoader,setShippingLoader,info, updateLocationData, zipCode, setZipCode, handleInputChange, handleButtonClick  } = useGlobalContext();
+  const { setAllShippingMethods, shippingMethods, setShippingMethods, shippingLoader, setShippingLoader, info, updateLocationData, zipCode, setZipCode, handleInputChange, handleButtonClick, totalTax,calculateTotalTax,getShippingInfo} = useGlobalContext();
 
   const handleCheckboxCheck = (index) => {
     setIsCheck((prev) => ({
@@ -56,10 +62,12 @@ const Cart = () => {
     console.log("checked value", isCheck)
   }
 
-  const { cart,calculateTotalPrice,subTotal ,savings,isCartProtected,
+
+  const { cart, calculateTotalPrice, subTotal, savings, isCartProtected,
     isProfessionalAssembly,
     handleCartProtected,
-    handleCartAssembly,} = useCart();
+    handleCartAssembly,
+  } = useCart();
   const subTotalOfAllProducts = cart.map(item => item.product.sub_total);
   // console.log("sub total of products", subTotalOfAllProducts)
   const subtotal = subTotalOfAllProducts.reduce((acc, value) => acc + value, 0)
@@ -72,6 +80,7 @@ const Cart = () => {
     }).format(price)
   }
 
+
   const protectionPrice = isCheck[0] ? 210 : 0;
   const assemblyPrice = isCheck[1] ? 250 : 0;
   const shipping = 109;
@@ -79,14 +88,7 @@ const Cart = () => {
   const taxPrice = 322;
 
   const grandTotal = subtotal + protectionPrice + assemblyPrice + shipping + taxPrice - discountPrice
-  const orderPriceDetails = [
-    { title: 'Subtotal', price: formatePrice(subTotal) },
-    { title: 'Protection plan', price: formatePrice(protectionPrice) },
-    { title: 'Professional Assembly', price: formatePrice(assemblyPrice) },
-    {title: 'Shipping', price: formatePrice(shipping)},
-    { title: 'Discount', price: formatePrice(discountPrice) },
-    { title: 'Tax', price: formatePrice(taxPrice) }
-  ]
+
   const handleZipInput = () => {
     setIsZipUpdateOpen(!isZipUpdateOpen)
   }
@@ -105,10 +107,76 @@ const Cart = () => {
       console.error("error", error);
     }
   }
+  const [selectedShippingMethods, setSelectedShippingMethods] = useState(null);
+  function getShippingMethods(subtotal, shippingMethods) {
+    setSelectedOption({});
+    console.log(subtotal, shippingMethods, "these are two");
+    let selectedMethods = [];
+  
+    // Case 1: METHOD-1 (Free Shipping)
+    const method1 = shippingMethods.find((method) => method.id === "METHOD-1");
+    if (method1 && subtotal >= method1.min_cost) {
+      selectedMethods.push(method1);
+    }
+  
+    // If METHOD-1 is applied, no other methods will be shown
+    if (selectedMethods.length === 1) {
+      setSelectedOption(method1); // Automatically select METHOD-1
+      setSelectedShippingMethods(selectedMethods);
+      console.log(selectedMethods, "selectedMethods are here");
+      return;
+    }
+  
+    // Case 2: METHOD-2 (Flat Rate Shipping)
+    const method2 = shippingMethods.find((method) => method.id === "METHOD-2");
+    if (method2) {
+      selectedMethods.push({ ...method2, cost: subtotal >= method2.min_cost ? method2.cost : 0 });
+    }
+  
+    // Case 3: METHOD-3 (Local Pickup)
+    const method3 = shippingMethods.find((method) => method.id === "METHOD-3");
+    if (method3 && method3.cost === 0) {
+      selectedMethods.push(method3);
+    }
+  
+    // Handle default selection logic
+    if (selectedMethods.length === 2) {
+      const defaultMethod = selectedMethods.find((method) => method.id === "METHOD-2") || method3;
+      setSelectedOption(defaultMethod); // Set METHOD-2 by default, or METHOD-3 if METHOD-2 is unavailable
+    } else if (selectedMethods.length > 0) {
+      setSelectedOption(selectedMethods[0]); // Default to the first available method
+    }
+  
+    console.log(selectedMethods, "selectedMethods are here");
+    setSelectedShippingMethods(selectedMethods);
+  }
+  
   useEffect(() => {
+    // Always fetch latest products when the component mounts
     getLatestProducts();
-    setAllShippingMethods();
-  }, []);
+    // Fetch shipping methods if they are available
+    if (shippingMethods) {
+      getShippingMethods(subTotal, shippingMethods['shippingMethods']);
+    }
+  }, []); // Empty dependency array ensures this runs once when the component mounts
+
+  useEffect(() => {
+    // Call getShippingMethods whenever subTotal or shippingMethods changes
+    if (shippingMethods) {
+      getShippingMethods(subTotal, shippingMethods['shippingMethods']);
+      setIsStarted(!isStarted);
+    }
+  }, [subTotal, shippingMethods]); // Dependency array for changes in subTotal or shippingMethods
+
+  useEffect(() => {
+    if (shippingMethods) {
+      getShippingMethods(subTotal, shippingMethods['shippingMethods']);
+    }
+   
+  }, [isStarted])
+
+  useEffect(() => { setSelectedShippingMethods(null) }, [info])
+
 
   const productsUids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const newProducts = latestProducts.filter((product) => productsUids.includes(product.uid));
@@ -126,6 +194,10 @@ const Cart = () => {
     setQuickView(true);
     setQuickViewProduct(item)
 
+  }
+
+  const navigateToCheckout = () => {
+    navigate("/cart-page/check-out");
   }
 
   const handleQuickViewClose = () => { setQuickView(false) }
@@ -176,49 +248,63 @@ const Cart = () => {
     ]
   };
 
-  // Define conditional visibility logic
-  const filteredOrderPriceDetails = orderPriceDetails.filter((_, index) => {
-    if (index === 1) return isCheck[0]; // Show 'Professional Assembly' if isCheck[0] is true
-    if (index === 2) return isCheck[1]; // Show 'Elite Title' if isCheck[1] is true
-    return true; // Always include other items
-  });
 
   const handleCardClick = (item) => {
-        navigate(`/single-product/${item.slug}`, {state: {products: item}})
-    }
+    navigate(`/single-product/${item.slug}`, { state: { products: item } })
+  }
 
   // wish list
-    const {addToList, removeFromList, isInWishList} = useList()
-    const notify = (str) => toast.success(str);
-    const notifyRemove = (str) => toast.error(str)
-    const handleWishList = (item) => {
-        if(isInWishList(item.uid)){
-            removeFromList(item.uid);
-            notifyRemove('Removed from wish list', {
-                autoClose: 10000,
-                className: "toast-message",
-            })
-        }else{
-            addToList(item)
-            notify("added to wish list", {
-                autoClose: 10000,
-            })
-        }
+  const { addToList, removeFromList, isInWishList } = useList()
+  const notify = (str) => toast.success(str);
+  const notifyRemove = (str) => toast.error(str)
+  const handleWishList = (item) => {
+    if (isInWishList(item.uid)) {
+      removeFromList(item.uid);
+      notifyRemove('Removed from wish list', {
+        autoClose: 10000,
+        className: "toast-message",
+      })
+    } else {
+      addToList(item)
+      notify("added to wish list", {
+        autoClose: 10000,
+      })
     }
+  }
 
 
-    const [selectedValue, setSelectedValue] = useState("");
+  const [selectedValue, setSelectedValue] = useState("");
 
-    const options = [
-      { id: 1, label: "Delivery & Setup",description:"Package is delivered inside the house and set up by our Professional Crew without mistake and hassle", value: "Delivery & Setup" },
-      { id: 2, label: "Delivery & No Setup",description:"Package is delivered on your front door but setup is not included", value: "Delivery & No Setup" },
-      { id: 3, label: "Local Pickup",description:"Come to your designated Furniture Mecca franchise and get your furniture packed and ready for you", value: "Local Pickup" },
-    ];
+  const options = [
+    { id: 1, label: "Delivery & Setup", description: "Package is delivered inside the house and set up by our Professional Crew without mistake and hassle", value: "Delivery & Setup" },
+    { id: 2, label: "Delivery & No Setup", description: "Package is delivered on your front door but setup is not included", value: "Delivery & No Setup" },
+    { id: 3, label: "Local Pickup", description: "Come to your designated Furniture Mecca franchise and get your furniture packed and ready for you", value: "Local Pickup" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  const handleChange = (e, option) => {
+    setSelectedOption(option); // Save the full option object in state
+    console.log(option, "Selected option is here");
+  };
+
+
+
+  const orderPriceDetails = [
+    { title: 'Subtotal', price: formatePrice(subTotal) },
+    { title: 'Protection plan', price: formatePrice(protectionPrice) },
+    { title: 'Professional Assembly', price: formatePrice(assemblyPrice) },
+    { title: `Shipping ${selectedOption? getShippingInfo(selectedOption)?.taxIncluded : ""}`, price: selectedOption? getShippingInfo(selectedOption).result:""},
+    { title: `Tax (${totalTax?.tax_name})`, price: totalTax? formatePrice(calculateTotalTax(subTotal,parseFloat(totalTax?.tax_value))):0 }
+  ]
+
+    // Define conditional visibility logic
+    const filteredOrderPriceDetails = orderPriceDetails.filter((_, index) => {
+      if (index === 1) return isCheck[0]; // Show 'Professional Assembly' if isCheck[0] is true
+      if (index === 2) return isCheck[1]; // Show 'Elite Title' if isCheck[1] is true
+      return true; // Always include other items
+    });
   
-    const handleChange = (e) => {
-      setSelectedValue(e.target.value);
-    };
-
   return (
     <div className='cart-main-container'>
       <CartMainImage />
@@ -230,31 +316,31 @@ const Cart = () => {
         <div className='cart-order-summery-section'>
           <div className='cart-order-summery-inner-section'>
             <h3 className='cart-order-summary-heading'>Order Summary</h3>
-            <p className='cart-order-summary-sub-title'>This order qualifies for free shipping</p>
+            {/* <p className='cart-order-summary-sub-title'>This order qualifies for free shipping</p> */}
             <div className='proffesional-assembly-check-sec'>
-                <label className='order-summary-proffesional-check-item-label'>
-                  <input
-                    type="checkbox"
-                    className='order-summary-checkbox'
-                    checked={isProfessionalAssembly}
-                    onChange={() => handleCartAssembly()}
-                  />
-                  Professional Assembly (+ $210)
-                </label>
-                <p className='order-summary-proffesional-check-item-detail'>Use professional assembly for all products and save up to $80</p>
-              </div>
-              <div className='proffesional-assembly-check-sec'>
-                <label className='order-summary-proffesional-check-item-label'>
-                  <input
-                    type="checkbox"
-                    className='order-summary-checkbox'
-                    checked={isCartProtected}
-                    onChange={() => handleCartProtected()}
-                  />
-                  Elite Platinum Furniture Protection(+ $199)
-                </label>
-                <p className='order-summary-proffesional-check-item-detail'>Use professional assembly for all products and save up to $80</p>
-              </div>
+              <label className='order-summary-proffesional-check-item-label'>
+                <input
+                  type="checkbox"
+                  className='order-summary-checkbox'
+                  checked={isProfessionalAssembly}
+                  onChange={() => handleCartAssembly()}
+                />
+                Professional Assembly (+ $210)
+              </label>
+              <p className='order-summary-proffesional-check-item-detail'>Use professional assembly for all products and save up to $80</p>
+            </div>
+            <div className='proffesional-assembly-check-sec'>
+              <label className='order-summary-proffesional-check-item-label'>
+                <input
+                  type="checkbox"
+                  className='order-summary-checkbox'
+                  checked={isCartProtected}
+                  onChange={() => handleCartProtected()}
+                />
+                Elite Platinum Furniture Protection(+ $199)
+              </label>
+              <p className='order-summary-proffesional-check-item-detail'>Use professional assembly for all products and save up to $80</p>
+            </div>
 
             <div className='cart-order-summary-price-details'>
               {filteredOrderPriceDetails.map((price, index) => (
@@ -270,41 +356,55 @@ const Cart = () => {
                 </span>
                 <div className={`cart-order-summary-zip-code-input-div ${isZipUpdateOpen ? 'show-zip-code-update-input' : ''}`}>
                   <div className='cart-order-summary-zip-code-input-and-button'>
-                    <input 
-                      type='text' 
-                      placeholder='Zip Code' 
+                    <input
+                      type='text'
+                      placeholder='Zip Code'
                       className='cart-summary-update-zip-input'
                       value={zipCode}
-                      onChange={handleInputChange} 
+                      onChange={handleInputChange}
                     />
-                    <button className='cart-summary-update-zip-btn' onClick={async () => {await handleButtonClick();} }>Update</button>
+                    <button className='cart-summary-update-zip-btn' onClick={async () => { await handleButtonClick(); }}>Update</button>
                   </div>
                 </div>
               </div>
 
               <div className="delivery-option-container">
                 <p className='delivery-opt-heading' >Delivery Options :</p>
-              {shippingMethods['shippingMethods'] &&  shippingMethods['shippingMethods']?.map((option) => (
-        <label key={option.id} style={{ display: "flex",   alignItems:"flex-start",
-          justifyContent:"flex-start", margin: "5px 0",gap:"10px" }}>
-          <input
-            type="radio"
-            name="options"
-            value={option.id}
-            checked={selectedValue === option.id}
-            onChange={handleChange}
-            style={{marginTop:"5px"
+                {selectedShippingMethods &&
+        selectedShippingMethods.map((option) => (
+          <label
+            key={option.id}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "flex-start",
+              margin: "5px 0",
+              gap: "10px",
             }}
-          />
-            <div style={{display:"flex",flexDirection:"column",
-              alignItems:"flex-start",
-              justifyContent:"center"
-            }}>
-            <p className='delivery-option-container-label'>{option.name}</p>
-            <p className='delivery-option-container-description'>{option.name}</p>
+          >
+            <input
+              type="radio"
+              name="options"
+              value={option.id}
+              checked={selectedOption?.id === option.id}
+              onChange={(e) => handleChange(e, option)} // Pass the `option` object
+              style={{
+                marginTop: "5px",
+              }}
+            />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "center",
+              }}
+            >
+              <p className="delivery-option-container-label">{option.name}</p>
+              <p className="delivery-option-container-description">{option.description}</p>
             </div>
-        </label>
-      ))}
+          </label>
+        ))}
               </div>
               <div className='order-summary-coupon-div'>
                 <p onClick={handleCouponInput}>Add Coupon Code <IoIosArrowDown className={`cart-order-summary-coupon-arrow ${isCouponOpen ? 'cart-order-summary-coupon-arrow-rotate' : ''}`} size={20} /></p>
@@ -328,7 +428,10 @@ const Cart = () => {
               </div>
             </div>
 
-            <Link to={'/cart-page/check-out'} className='cart-summary-proceed-btn'>Proceed to checkout</Link>
+            <button
+              //  to={'/cart-page/check-out'} 
+              onClick={navigateToCheckout}
+              className='cart-summary-proceed-btn'>Proceed to checkout</button>
 
           </div>
         </div>
@@ -343,49 +446,49 @@ const Cart = () => {
           <Slider {...settings}>
             {newProducts && newProducts.length > 0 ? (
               newProducts.map((item, index) => (
-              <div key={index} className='cart-latest-product-cards-container'>
-                <ProductCard
-                  key={index}
-                  slug={item.slug}
-                  singleProductData={item}
-                  maxWidthAccordingToComp="98%"
-                  // justWidth={'320px'}
-                  tagIcon={item.productTag ? item.productTag : heart}
-                  tagClass={item.productTag ? 'tag-img' : 'heart-icon'}
-                  mainImage={`${item.image.image_url}`}
-                  productCardContainerClass="product-card"
-                  ProductSku={item.sku}
-                  tags={item.tags}
-                  ProductTitle={truncateTitle(item.name, maxLength)}
-                  stars={[
-                    { icon: star, title: 'filled' },
-                    { icon: star, title: 'filled' },
-                    { icon: star, title: 'filled' },
-                    { icon: star, title: 'filled' },
-                    { icon: star, title: 'filled' },
-                  ]}
-                  reviewCount={item.reviewCount}
-                  lowPriceAddvertisement={item.lowPriceAddvertisement}
-                  priceTag={item.regular_price}
-                  sale_price={item.sale_price}
-                  financingAdd={item.financingAdd}
-                  learnMore={item.learnMore}
-                  mainIndex={index}
-                  deliveryTime={item.deliveryTime}
-                  stock={item.manage_stock}
-                  attributes={item.attributes}
-                  handleCardClick={() => handleProductClick(item)}
-                  handleQuickView={() => handleQuickViewOpen(item)}
-                  type={item.type}
-                  variation={item.variations}
-                  handleWishListclick={() => handleWishList(item)}
-                />
-              </div>
-            ))
+                <div key={index} className='cart-latest-product-cards-container'>
+                  <ProductCard
+                    key={index}
+                    slug={item.slug}
+                    singleProductData={item}
+                    maxWidthAccordingToComp="98%"
+                    // justWidth={'320px'}
+                    tagIcon={item.productTag ? item.productTag : heart}
+                    tagClass={item.productTag ? 'tag-img' : 'heart-icon'}
+                    mainImage={`${item.image.image_url}`}
+                    productCardContainerClass="product-card"
+                    ProductSku={item.sku}
+                    tags={item.tags}
+                    ProductTitle={truncateTitle(item.name, maxLength)}
+                    stars={[
+                      { icon: star, title: 'filled' },
+                      { icon: star, title: 'filled' },
+                      { icon: star, title: 'filled' },
+                      { icon: star, title: 'filled' },
+                      { icon: star, title: 'filled' },
+                    ]}
+                    reviewCount={item.reviewCount}
+                    lowPriceAddvertisement={item.lowPriceAddvertisement}
+                    priceTag={item.regular_price}
+                    sale_price={item.sale_price}
+                    financingAdd={item.financingAdd}
+                    learnMore={item.learnMore}
+                    mainIndex={index}
+                    deliveryTime={item.deliveryTime}
+                    stock={item.manage_stock}
+                    attributes={item.attributes}
+                    handleCardClick={() => handleProductClick(item)}
+                    handleQuickView={() => handleQuickViewOpen(item)}
+                    type={item.type}
+                    variation={item.variations}
+                    handleWishListclick={() => handleWishList(item)}
+                  />
+                </div>
+              ))
             ) : (
               Array.from({ length: 4 }).map((_, index) => (
-                            <ProductCardShimmer />
-                        ))
+                <ProductCardShimmer />
+              ))
             )}
             {/* newProducts.map((item, index) => (
               <div key={index} className='cart-latest-product-cards-container'>

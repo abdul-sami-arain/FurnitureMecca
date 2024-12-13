@@ -52,7 +52,7 @@ const TrendingNow = () => {
                 <div className="tranding-slides" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
                     {data.sliders && data.sliders.map((image, index) => (
                         <div className="tranding-slide" key={index}>
-                            <LazyLoadImage src={`${url}${image.image_url}`} alt={`Slide ${index + 1}`} effect='blur' />
+                            <img src={`${url}${image.image_url}`} alt={`Slide ${index + 1}`} effect='blur' />
                         </div>
                     ))}
                 </div>
@@ -60,7 +60,7 @@ const TrendingNow = () => {
             <div className='trending-items-cards'>
                 {productArray.map((item, index) => (
                     <div key={item.uid} className='trending-item-category'>
-                        <LazyLoadImage src={`${url}${item.image_url}`} alt={item.alt_text} effect='blur' />
+                        <img src={`${url}${item.image_url}`} alt={item.alt_text} effect='blur' />
                     </div>
                 ))} 
             </div>

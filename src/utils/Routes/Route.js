@@ -51,6 +51,7 @@ import StoreLocator from "../../UI/Pages/StoreLocator/StoreLocator";
 import BlogPage from "../../UI/Pages/Blogs/BlogPage";
 import SingleBlog from "../../UI/Pages/SingleBlog/SingleBlog";
 import WishList from "../../UI/Pages/WishList/WishList";
+import ActiveCategoryPage from "../../UI/Pages/ActiveCategoryPage/ActiveCategoryPage";
 
 const categoryCardData = [
     { title: "Dining Room Sets", img: newArrivalImage, link: '#' },
@@ -261,22 +262,16 @@ const routes = (
 
         {/* Sale Day */}
         <Route
-            path="/labor-day-sale"
+            path="/holiday-sale"
             element={
-                <Categories
-                    categoriesMainImage={tentSaleMainImage}
-                    mobileViewMainImage={livingRoomMobileBanner}
-                    showBanners={false}
-                    categoryCartTitle={'Labor Day Sale'}
-                    categoryCardData={categoryCardData}
-                    newArrival={true}
+                <ActiveCategoryPage
                 />
             }
         />
 
         {/* Product Archive Page Routes */}
         <Route
-            path='/labor-day-sale'
+            path='/holiday-sale'
             element={
                 <ProductArchive
                     productArchiveHading={`Labor Day Sale`}

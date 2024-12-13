@@ -1,14 +1,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { url } from "../../utils/api";
+import { useCart } from "../cartContext/cartContext";
 
 const GlobalContext = createContext();
-// const singleProductContext = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
 
     const [stores,setStores] = useState([]);
-    const [shippingMethods,setShippingMethods] = useState([]);
+    const [shippingMethods,setShippingMethods] = useState(null);
+    const [totalTax,setTotalTax] = useState(null);
     const [shippingLoader,setShippingLoader]=useState(false);
+    const [taxLoader,setTaxLoader]=useState(false);
+    const {subTotal,cartProducts} = useCart();
 
 
     const [info, setInfo] = useState(() => {
@@ -40,6 +43,7 @@ export const GlobalContextProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('other_info', JSON.stringify(info));
         fetchAllstores();
+        // console.log(subTotal,"here is")
     }, [info])
 
  
@@ -105,10 +109,36 @@ export const GlobalContextProvider = ({ children }) => {
           const data = await response.json();
           console.log("API Response:", data);
           setShippingLoader(false)
-          return data.shippingZones[0]; // You can return the data for further processing
+          return data; // You can return the data for further processing
         } catch (error) {
           console.error("Error fetching data:", error);
           setShippingLoader(false)
+          return null; // Return null or handle the error accordingly
+        }
+    }
+
+
+
+    async function getTotalTax() {
+        const apiUrl = `${url}/api/v1/tax/get?stateCode=${info.locationData.stateCode}`;
+      
+        try {
+            setTaxLoader(true)
+          const response = await fetch(apiUrl);
+          
+          if (!response.ok) {
+            setTaxLoader(false)
+            throw new Error(`Error: ${response.status} - ${response.statusText}`);
+            
+          }
+      
+          const data = await response.json();
+          console.log("API Response:", data);
+          setTaxLoader(false)
+          return data; // You can return the data for further processing
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setTaxLoader(false)
           return null; // Return null or handle the error accordingly
         }
     }
@@ -132,11 +162,62 @@ export const GlobalContextProvider = ({ children }) => {
 
     const setAllShippingMethods = async () => {
         const data = await getShippingMethods();
-    
-        if (data) {
-            setShippingMethods(data); // Set the sorted data to the state
-        }
+        setShippingMethods(data?.shippingZones[0]);
     };
+
+
+    const setTaxValues = async () => {
+        const data = await getTotalTax();
+        setTotalTax(data?.tax[0]);
+    };
+
+    function calculateTotalTax(subtotal, taxRate) {
+        if (isNaN(subtotal) || isNaN(taxRate) || subtotal < 0 || taxRate < 0) {
+          throw new Error("Invalid input: subtotal and taxRate must be non-negative numbers.");
+        }
+        const taxAmount = (subtotal * taxRate) / 100;
+        return taxAmount;
+    }
+      
+
+//      function getShippingMethods(subtotal, shippingMethods) {
+//     let selectedMethods = [];
+  
+//     // Case 1: METHOD-1 (Free Shipping)
+//     const method1 = shippingMethods.find(method => method.id === "METHOD-1");
+//     if (method1 && subtotal >= method1.min_cost) {
+//         selectedMethods.push(method1);
+//     }
+
+//     // If METHOD-1 is applied, no other methods will be shown
+//     if (selectedMethods.length > 0) {
+
+//         setSelectedShippingMethods(selectedMethods);
+//         console.log(selectedMethods,"selectedMethods are here");
+//         return;
+//     }
+
+//     // Case 2: METHOD-2 (Flat Rate Shipping)
+//     const method2 = shippingMethods.find(method => method.id === "METHOD-2");
+//     if (method2) {
+//         selectedMethods.push({ ...method2, cost: subtotal >= method2.min_cost ? method2.cost : 0 });
+//     }
+  
+//     // Case 3: METHOD-3 (Local Pickup)
+//     const method3 = shippingMethods.find(method => method.id === "METHOD-3");
+//     if (method3 && method3.cost === 0) {
+//         selectedMethods.push(method3);
+//     }
+//     console.log(selectedMethods,"selectedMethods are here");
+  
+//     setSelectedShippingMethods(selectedMethods)
+//   }
+
+
+    useEffect(()=>{
+        setAllShippingMethods();
+        setTaxValues();
+    },[info])
 
       
 
@@ -156,6 +237,27 @@ export const GlobalContextProvider = ({ children }) => {
             })
         }
     };
+
+    function getShippingInfo(option) {
+        let result = "";
+        let taxIncluded = "";
+      
+        if (option.id === "METHOD-2") {
+          result = option.cost;
+          taxIncluded = option.tax !== 0 ? "Tax Included" : "";
+        } else if (option.id === "METHOD-1") {
+          result = "free shipping"; 
+          taxIncluded = "";
+        } else if (option.id === "METHOD-3") {
+          result = "local pickup";
+          taxIncluded = "";
+        } else {
+          result = "Identifying";
+        }
+      
+        return { result, taxIncluded };
+      }
+      
     
 
     return (
@@ -164,7 +266,8 @@ export const GlobalContextProvider = ({ children }) => {
             setInfo,
             updateLocationData,
             zipCode, setZipCode, handleInputChange, handleButtonClick,
-            fetchAllstores,stores,setStores,setAllShippingMethods,shippingMethods,setShippingMethods,shippingLoader,setShippingLoader
+            fetchAllstores,stores,setStores,setAllShippingMethods,shippingMethods,setShippingMethods,shippingLoader,setShippingLoader,
+            totalTax,calculateTotalTax,getShippingInfo
         }}>
             {children}
         </GlobalContext.Provider>

@@ -20,13 +20,16 @@ import { ProductPageProvider } from './context/ProductPageContext/productPageCon
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SEOctxProvider } from './context/SEOcontext/SEOcontext';
 import { GlobalContextProvider } from './context/GlobalContext/globalContext';
+import { ActiveSalePageProvider } from './context/ActiveSalePageContext/ActiveSalePageContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <HelmetProvider>
       <SEOctxProvider>
+      <CartProvider>
         <GlobalContextProvider>
+          <ActiveSalePageProvider>
     <WishListProvider>
     <LPContentProvider>
     <OrderProvivder>
@@ -34,7 +37,7 @@ root.render(
         {/* <SingleProductProvider> */}
           <AddCartProvider>
             <ProductProvider>
-              <CartProvider>
+              
                 <SingleProductProvider>
                   <MyOrdersProvider>
                     <ProductPageProvider>
@@ -50,7 +53,7 @@ root.render(
                     </ProductPageProvider>
                   </MyOrdersProvider>
                 </SingleProductProvider>
-              </CartProvider>
+              
             </ProductProvider>
           </AddCartProvider>
         {/* </SingleProductProvider> */}
@@ -58,7 +61,9 @@ root.render(
     </OrderProvivder>
     </LPContentProvider>
     </WishListProvider>
+    </ActiveSalePageProvider>
     </GlobalContextProvider>
+    </CartProvider>
     </SEOctxProvider>
     </HelmetProvider>
   </React.StrictMode>

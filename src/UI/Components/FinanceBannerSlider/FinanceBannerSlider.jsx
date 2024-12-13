@@ -44,7 +44,7 @@ function FinanceBannerSlider() {
         <div className="carousel-wrapper" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
             {images.map((image, index) => {
                 return <div className="carousel-slide" key={index}>
-                    <LazyLoadImage src={`${url}${image.image_url}`} alt={`slide ${index + 1}`} effect="blur" />
+                    <img src={`${url}${image.image_url}`} alt={`slide ${index + 1}`} effect="blur" />
                 </div>
             })}
         </div>

@@ -59,12 +59,23 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [content2, setContent2] = useState({});
   const [featuredProducts, setFeaturedProducts] = useState([]);
+      const [slides, setSlides] = useState([])
 
   const location = useLocation();
   useEffect(() => {
     setCurrentUrl(location.pathname);
   }, [location]);
 
+
+
+      const getHomeSliderImages = async () => {
+        try {
+            const response = await axios.get(`${url}/api/v1/pages/home/slider/get`)
+            setSlides(response.data.homeSliders || [])
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
 
   const getLandingPageContent2 = async () => {
@@ -81,22 +92,26 @@ const Home = () => {
       setLoading(false);
     }
   }
-
   const getFeaturedProducts = async () => {
-    const api = `/api/v1/products/featured-products`
+    const api = "/api/v1/products/featured-products";
     try {
       setLoading(true);
-      const response = await axios.get(`${url}${api}`)
-      setFeaturedProducts(response.data.products);
+      const response = await axios.get(`${url}${api}`);
+      // Filter products where parent === 0
+      const filteredProducts = response.data.products.filter(
+        (product) => product.parent === 0
+      );
+      setFeaturedProducts(filteredProducts);
       setLoading(false);
-      console.log(response.data)
-
+      console.log(filteredProducts);
     } catch (error) {
-      console.error("error fetching contents", error);
+      console.error("Error fetching contents", error);
       setLoading(false);
     }
-  }
+  };
+  
   useEffect(() => {
+    getHomeSliderImages();
     postData();
     getLandingPageContent2();
     getFeaturedProducts();
@@ -116,7 +131,7 @@ const Home = () => {
   return (
     <div className='home-page-main-container'>
       <NearStorePopUp />
-      <Sliderr />
+      <Sliderr images={slides ? slides : []} />
       <ShipBanner bannerImg={shipBanner} showBanner={true} paddindTrue={false} />
       <Category title={'Shop by Category'} categoryData={landingPageCategories} handleNavigate={handleNavigate} />
       <MobileFinancingSlider />
