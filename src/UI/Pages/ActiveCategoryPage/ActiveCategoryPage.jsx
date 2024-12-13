@@ -13,6 +13,7 @@ import CartSidePannel from "../../Components/Cart-side-section/CartSidePannel";
 import { useCart } from "../../../context/cartContext/cartContext";
 import QuickView from "../../Components/QuickView/QuickView";
 import { IoMdClose } from "react-icons/io";
+import { toast } from "react-toastify";
 
 export default function ActiveCategoryPage() {
     const navigate = useNavigate();
