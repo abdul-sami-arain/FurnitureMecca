@@ -8,7 +8,7 @@ const ShippingForm = () => {
     const [isChecked, setIsChecked] = useState(false);
     const handleCheckboxClick = () => { setIsChecked(!isChecked) }
 
-    const {orderPayload, emptyField, setEmptyField, handleNestedValueChange, loading, handleValueChange, handleClickTop, handleTabOpen} = useMyOrders();
+    const {orderPayload, emptyField, setEmptyField, handleNestedValueChange,handleNestedValueChangeShipping,handleNestedShippingBool, loading, handleValueChange, handleClickTop, handleTabOpen} = useMyOrders();
 
     // const validateBillingFields = () => {
     //     const {billing} = orderPayload;
@@ -33,6 +33,7 @@ const ShippingForm = () => {
                 newErrorObj[field] = `required`
             }
         }
+        console.log(billing,"here is billing detsile")
         setEmptyField(newErrorObj);
         return Object.keys(newErrorObj).length === 0;
     };
@@ -45,9 +46,6 @@ const ShippingForm = () => {
         handleClickTop()
         console.log("Order submitted:", orderPayload);
         }
-        // else {
-        // alert("Please fill in all fields!");
-        // }
     };
 
     if(loading){
@@ -72,7 +70,7 @@ const ShippingForm = () => {
                     <SummaryInputFields
                         type={'text'}
                         name={'last_name'}
-                        value={orderPayload.last_name}
+                        value={orderPayload.billing?.last_name || ''}
                         label={'Last Name'}
                         fieldRequired={true}
                         placeholder={'Last Name'}
@@ -84,7 +82,7 @@ const ShippingForm = () => {
                 <div className='email-container'>
                     <SummaryInputFields
                         type={'text'}
-                        value={orderPayload.email}
+                        value={orderPayload.billing?.email || ''}
                         label={'Email'}
                         fieldRequired={true}
                         placeholder={'Email'}
@@ -101,7 +99,7 @@ const ShippingForm = () => {
                 <div className='shipping-address'>
                     <SummaryInputFields
                         type={'text'}
-                        value={orderPayload.address_1}
+                        value={orderPayload.billing?.address_1 || ''}
                         label={'Street Address'}
                         fieldRequired={true}
                         placeholder={'House number & Street number'}
@@ -112,13 +110,18 @@ const ShippingForm = () => {
                     />
                     <SummaryInputFields
                         type={'text'}
-                        placeholder={'Apartment, suite, unit etc'} 
+                        value={orderPayload.billing?.address_2 || ''}
+                        placeholder={'Apartment, suite, unit etc'}
+                        fieldRequired={false}
+                        name={'address_2'}
+                        onChange={handleNestedValueChange}
+                        error={emptyField.address_2} 
                     />
                 </div>
                 <div className='city-state-zip'>
                     <SummaryInputFields
                         type={'text'}
-                        value={orderPayload.postal_code}
+                        value={orderPayload.billing?.postal_code || ''}
                         label={'Zip Code'}
                         // fieldRequired={true}
                         name={'postal_code'}
@@ -128,7 +131,7 @@ const ShippingForm = () => {
                     />
                     <SummaryInputFields
                         type={'text'}
-                        value={orderPayload.city}
+                        value={orderPayload.billing?.city || ''}
                         label={'Town/City'}
                         name={'city'}
                         required={'required'}
@@ -137,7 +140,7 @@ const ShippingForm = () => {
                     />
                     <SummaryInputFields
                         type={'text'}
-                        value={orderPayload.state}
+                        value={orderPayload.billing?.state || ''}
                         label={'State'}
                         fieldRequired={true}
                         placeholder={'Pennsylvanian'}
@@ -150,7 +153,7 @@ const ShippingForm = () => {
                 <div>
                     <SummaryInputFields
                         type={'text'}
-                        value={orderPayload.phone}
+                        value={orderPayload.billing?.phone || ''}
                         label={'Phone'}
                         fieldRequired={true}
                         placeholder={'Phone'}
@@ -163,25 +166,90 @@ const ShippingForm = () => {
                 <div className='different-billing-option'>
                     <div className='different-billing-checkox'>
                         <input type='checkbox' id='defferent-billing' onClick={handleCheckboxClick} />
-                        <label for='defferent-billing'>Want to use defferent billing address</label>
+                        <label for='defferent-billing'>Ship to a different Address</label>
                     </div>
                     <div className={`defferent-billing-option-true ${isChecked ? 'show-defferent-billing-option' : ''}`}>
                         <div className='first-name-last-name'>
-                            <SummaryInputFields type={'text'} label={'First Name'} fieldRequired={true} placeholder={'First Name'} />
-                            <SummaryInputFields type={'text'} label={'Last Name'} fieldRequired={true} placeholder={'Last Name'} />
+                        <SummaryInputFields
+                        type={'text'}
+                        value={orderPayload.shipping?.first_name || ''}
+                        label={'First Name'}
+                        fieldRequired={isChecked ? true : false}
+                        placeholder={'First Name'}
+                        name={'first_name'}
+                        required={'required'}
+                        onChange={handleNestedValueChangeShipping}
+                        error={emptyField.first_name}
+                    />
+                    <SummaryInputFields
+                        type={'text'}
+                        name={'last_name'}
+                        value={orderPayload.shipping?.last_name || ''}
+                        label={'Last Name'}
+                        fieldRequired={isChecked ?true:false}
+                        placeholder={'Last Name'}
+                        required={'required'}
+                        onChange={handleNestedValueChangeShipping}
+                        error={emptyField.last_name}
+                    />
                         </div>
                         <div className='country-region'>
                             <p>Country/ Region</p>
                             <h3>United States (USA)</h3>
                         </div>
                         <div className='shipping-address'>
-                            <SummaryInputFields type={'text'} label={'Street Address'} fieldRequired={true} placeholder={'House number & Street number'} />
-                            <SummaryInputFields type={'text'} placeholder={'Apartment, suite, unit etc'} />
+                        <SummaryInputFields
+                        type={'text'}
+                        value={orderPayload.shipping?.address_1 || ''}
+                        label={'Street Address'}
+                        fieldRequired={isChecked ?true:false}
+                        placeholder={'House number & Street number'}
+                        name={'address_1'}
+                        required={'required'}
+                        onChange={handleNestedValueChangeShipping}
+                        error={emptyField.address_1}
+                    />
+                    <SummaryInputFields
+                        type={'text'}
+                        placeholder={'Apartment, suite, unit etc'}
+                        value={orderPayload.shipping?.address_2 || ''}
+                        fieldRequired={false}
+                        name={'address_2'}
+                        onChange={handleNestedValueChangeShipping}
+                        error={emptyField.address_2} 
+                    />
                         </div>
                         <div className='city-state-zip'>
-                            <SummaryInputFields type={'text'} label={'Zip Code'} fieldRequired={true} />
-                            <SummaryInputFields type={'text'} label={'Town/City'} />
-                            <SummaryInputFields type={'text'} label={'State'} fieldRequired={true} placeholder={'Pennsylvanian'} />
+                        <SummaryInputFields
+                        type={'text'}
+                        value={orderPayload.shipping?.postal_code || ''}
+                        label={'Zip Code'}
+                        fieldRequired={isChecked ?true:false}
+                        name={'postal_code'}
+                        required={'required'}
+                        onChange={handleNestedValueChangeShipping}
+                        error={emptyField.postal_code}
+                    />
+                    <SummaryInputFields
+                        type={'text'}
+                        value={orderPayload.shipping?.city || ''}
+                        label={'Town/City'}
+                        name={'city'}
+                        required={'required'}
+                        onChange={handleNestedValueChangeShipping}
+                        error={emptyField.city}
+                    />
+                    <SummaryInputFields
+                        type={'text'}
+                        value={orderPayload.shipping?.state || ''}
+                        label={'State'}
+                        fieldRequired={isChecked ?true:false}
+                        placeholder={'Pennsylvanian'}
+                        name={'state'}
+                        required={'required'}
+                        onChange={handleNestedValueChangeShipping}
+                        error={emptyField.state}
+                    />
                         </div>
                     </div>
                 </div>

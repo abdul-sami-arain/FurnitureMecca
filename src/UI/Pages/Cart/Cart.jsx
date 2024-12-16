@@ -19,6 +19,7 @@ import ProductCardShimmer from '../../Components/Loaders/productCardShimmer/prod
 import { useList } from '../../../context/wishListContext/wishListContext'
 import { toast } from 'react-toastify'
 import { useGlobalContext } from '../../../context/GlobalContext/globalContext'
+import Breadcrumb from '../../../Global-Components/BreadCrumb/BreadCrumb'
 
 
 
@@ -51,7 +52,7 @@ const Cart = () => {
   const [isCheck, setIsCheck] = useState({});
   const [isStarted, setIsStarted] = useState(false);
 
-  const { setAllShippingMethods, shippingMethods, setShippingMethods, shippingLoader, setShippingLoader, info, updateLocationData, zipCode, setZipCode, handleInputChange, handleButtonClick, totalTax,calculateTotalTax,getShippingInfo} = useGlobalContext();
+  const { setAllShippingMethods, shippingMethods, setShippingMethods, shippingLoader, setShippingLoader, info, updateLocationData, zipCode, setZipCode, handleInputChange, handleButtonClick, totalTax,calculateTotalTax,getShippingInfo,selectedOption, setSelectedOption,handleChange,getShippingMethods,selectedShippingMethods, setSelectedShippingMethods} = useGlobalContext();
 
   const handleCheckboxCheck = (index) => {
     setIsCheck((prev) => ({
@@ -107,49 +108,9 @@ const Cart = () => {
       console.error("error", error);
     }
   }
-  const [selectedShippingMethods, setSelectedShippingMethods] = useState(null);
-  function getShippingMethods(subtotal, shippingMethods) {
-    setSelectedOption({});
-    console.log(subtotal, shippingMethods, "these are two");
-    let selectedMethods = [];
-  
-    // Case 1: METHOD-1 (Free Shipping)
-    const method1 = shippingMethods.find((method) => method.id === "METHOD-1");
-    if (method1 && subtotal >= method1.min_cost) {
-      selectedMethods.push(method1);
-    }
-  
-    // If METHOD-1 is applied, no other methods will be shown
-    if (selectedMethods.length === 1) {
-      setSelectedOption(method1); // Automatically select METHOD-1
-      setSelectedShippingMethods(selectedMethods);
-      console.log(selectedMethods, "selectedMethods are here");
-      return;
-    }
-  
-    // Case 2: METHOD-2 (Flat Rate Shipping)
-    const method2 = shippingMethods.find((method) => method.id === "METHOD-2");
-    if (method2) {
-      selectedMethods.push({ ...method2, cost: subtotal >= method2.min_cost ? method2.cost : 0 });
-    }
-  
-    // Case 3: METHOD-3 (Local Pickup)
-    const method3 = shippingMethods.find((method) => method.id === "METHOD-3");
-    if (method3 && method3.cost === 0) {
-      selectedMethods.push(method3);
-    }
-  
-    // Handle default selection logic
-    if (selectedMethods.length === 2) {
-      const defaultMethod = selectedMethods.find((method) => method.id === "METHOD-2") || method3;
-      setSelectedOption(defaultMethod); // Set METHOD-2 by default, or METHOD-3 if METHOD-2 is unavailable
-    } else if (selectedMethods.length > 0) {
-      setSelectedOption(selectedMethods[0]); // Default to the first available method
-    }
-  
-    console.log(selectedMethods, "selectedMethods are here");
-    setSelectedShippingMethods(selectedMethods);
-  }
+
+
+
   
   useEffect(() => {
     // Always fetch latest products when the component mounts
@@ -273,20 +234,6 @@ const Cart = () => {
   }
 
 
-  const [selectedValue, setSelectedValue] = useState("");
-
-  const options = [
-    { id: 1, label: "Delivery & Setup", description: "Package is delivered inside the house and set up by our Professional Crew without mistake and hassle", value: "Delivery & Setup" },
-    { id: 2, label: "Delivery & No Setup", description: "Package is delivered on your front door but setup is not included", value: "Delivery & No Setup" },
-    { id: 3, label: "Local Pickup", description: "Come to your designated Furniture Mecca franchise and get your furniture packed and ready for you", value: "Local Pickup" },
-  ];
-
-  const [selectedOption, setSelectedOption] = useState(null);
-
-  const handleChange = (e, option) => {
-    setSelectedOption(option); // Save the full option object in state
-    console.log(option, "Selected option is here");
-  };
 
 
 
@@ -308,6 +255,7 @@ const Cart = () => {
   return (
     <div className='cart-main-container'>
       <CartMainImage />
+      
       <div className='cart-body'>
         <div className='cart-products-section'>
           <CartProducts />

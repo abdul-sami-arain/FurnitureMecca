@@ -140,8 +140,9 @@ const Home = () => {
       <AnnouncmentBanners bannerImage={sixMonthCreditImage} padding={'10px 0'} />
       <AnnouncmentBanners bannerImage={paymentOptionsBanner} padding={'10px 0'} />
       <FinanceBannerSlider />
-      <TrendingNow />
       <LandingPageFinancing />
+      <TrendingNow />
+      
       <BestSellerSlider />
       {/* <ImageSlider /> */}
       {content2?.section_2 && (

@@ -14,9 +14,10 @@
 
 .cart-products-heading{
     display: flex;
+    flex-direction: column;
     width: 100%;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: flex-start;
     padding: 0 10px 15px 10px;
 }
 
@@ -523,7 +524,7 @@
 
     .cart-products-heading {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         /* padding: 0 105px 15px 105px; */
     }
     /* .cart-items{
@@ -551,7 +552,7 @@
 @media only screen and (min-width: 781px) and (max-width: 1024px) {
     .cart-products-heading {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         padding: 0 50px 15px 50px;
     }
 

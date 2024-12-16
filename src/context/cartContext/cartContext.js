@@ -91,6 +91,7 @@ export const CartProvider = ({ children }) => {
                             sale_price: product.type === "simple" ? product.sale_price : variationData.sale_price,
                             regular_price: product.type === "simple" ? product.regular_price : variationData.regular_price,
                             quantity: 1,
+                            sku:product.type === "simple" ? product.sku : variationData.sku,
                             is_protected: isProtected,
                         },
                     ],
@@ -438,45 +439,12 @@ export const CartProvider = ({ children }) => {
             // Calculate savings
             savings += (regularPrice - salePrice) * quantity;
         });
-    
-        setSubTotal(total+(isCartProtected?totalProtectionValue:0)+(isProfessionalAssembly?professionalAssemblyValue:0));
+       console.log(total,savings,(isProfessionalAssembly?professionalAssemblyValue:0),(isCartProtected?totalProtectionValue:0),"here uis total")
+        setSubTotal(total+ (isCartProtected?totalProtectionValue:0)+(isProfessionalAssembly?professionalAssemblyValue:0));
     
         // Assuming you have a state or method to update the savings
         setSavings(savings);
     };
-
-    function getShippingMethods(subtotal, shippingMethods) {
-        let selectedMethods = [];
-      
-        // Case 1: METHOD-1 (Free Shipping)
-        const method1 = shippingMethods.find(method => method.id === "METHOD-1");
-        if (method1 && subtotal >= method1.min_cost) {
-            selectedMethods.push(method1);
-        }
-    
-        // If METHOD-1 is applied, no other methods will be shown
-        if (selectedMethods.length > 0) {
-    
-            setSelectedShippingMethods(selectedMethods);
-            console.log(selectedMethods,"selectedMethods are here");
-            return;
-        }
-    
-        // Case 2: METHOD-2 (Flat Rate Shipping)
-        const method2 = shippingMethods.find(method => method.id === "METHOD-2");
-        if (method2) {
-            selectedMethods.push({ ...method2, cost: subtotal >= method2.min_cost ? method2.cost : 0 });
-        }
-      
-        // Case 3: METHOD-3 (Local Pickup)
-        const method3 = shippingMethods.find(method => method.id === "METHOD-3");
-        if (method3 && method3.cost === 0) {
-            selectedMethods.push(method3);
-        }
-        console.log(selectedMethods,"selectedMethods are here");
-      
-        setSelectedShippingMethods(selectedMethods)
-      }
     
     
 

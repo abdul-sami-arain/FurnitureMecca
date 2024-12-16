@@ -102,6 +102,7 @@ const QuickViewVariations = ({ default_uid, attributes, productData, variations,
                             <div className='attribute-variations' style={{height:"60px"}}>
                                 {attribute.options.map((option) => (
                                     <div
+                                    title={option.name}
                                         key={option.value}
                                         className={`attribute-single-color `}
                                         onClick={() => handleAttributeSelection(attribute.name, option)}
@@ -112,7 +113,7 @@ const QuickViewVariations = ({ default_uid, attributes, productData, variations,
                                             }`}
                                             style={{ backgroundColor: option.value }}
                                         ></div>
-                                        <p className='quick-view-atribute-option-name'>{option.name}</p>
+                                        {/* <p className='quick-view-atribute-option-name'>{option.name}</p> */}
                                     </div>
                                 ))}
                             </div>

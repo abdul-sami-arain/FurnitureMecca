@@ -171,7 +171,7 @@ const SizeVariant = ({
                             <div className="attribute-variations" style={{height:"60px"}}>
                             {attribute.options.map((option, index) => (
     <div className="attribute-single-color" key={index}>
-        <div
+        <div title={option.name}
             className={`attribute-color-variation-box ${
                 selectedSelectAttrs[attribute.name] === option.value
                     ? 'selected'
@@ -182,7 +182,7 @@ const SizeVariant = ({
                 backgroundColor: option.value,
             }}
         ></div>
-        <p className='quick-view-atribute-option-name'>{option.name}</p>
+        {/* <p className='quick-view-atribute-option-name'>{option.name}</p> */}
     </div>
 ))}
 

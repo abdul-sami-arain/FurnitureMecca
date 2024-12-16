@@ -33,12 +33,15 @@ const TrendingNow = () => {
     // console.log("tranding now data", data)
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % data.sliders && data.sliders.length);
-        }, 3000); // Change slide every 3 seconds
-
-        return () => clearInterval(interval); // Cleanup interval on component unmount
-    }, [data.sliders]);
+        if (data.sliders && data.sliders.length > 0) {
+            const interval = setInterval(() => {
+                setCurrentIndex((prevIndex) => (prevIndex + 1) % data.sliders.length); // Ensure modulus is applied to the slider length
+            }, 3000); // Change slide every 3 seconds
+    
+            return () => clearInterval(interval); // Cleanup interval on component unmount
+        }
+    }, [data.sliders]); // Dependency array to re-run when data.sliders changes
+    
     // Extract only the product objects
     const productArray = Object.keys(data)
     .filter(key => key.startsWith('product_'))

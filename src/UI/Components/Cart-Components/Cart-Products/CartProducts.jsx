@@ -14,6 +14,7 @@ import axios from 'axios';
 import { url } from '../../../../utils/api';
 // import CArtEmpty from './cart-empty/CArtEmpty';
 // import CartEmpty from './cart-empty/CartEmpty';
+import Breadcrumb from '../../../../Global-Components/BreadCrumb/BreadCrumb';
 
 
 const CartProducts = () => {
@@ -96,6 +97,7 @@ const CartProducts = () => {
         <>
             <div className='cart-products-main-container'>
                 <div className='cart-products-heading'>
+                    <Breadcrumb/>
                     <h3>Products ({cartProducts.products.length})</h3>
                     {/* <button 
                         className={`protect-all-products-button ${protectAll ? 'protect-all-products-button-true' : ''}`}

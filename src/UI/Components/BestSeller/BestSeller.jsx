@@ -18,12 +18,23 @@ import bestSellerMobileBanner from '../../../Assets/Furniture Mecca/Landing Page
 import { url } from '../../../utils/api';
 import axios from 'axios';
 import BestSellerProductCardShimmer from '../BestSellerProductCard/BestSellerProductCardShimmer';
+import { useSingleProductContext } from '../../../context/singleProductContext/singleProductContext';
+import { useCart } from '../../../context/cartContext/cartContext';
+import star from "../../../Assets/icons/Star 19.png"
 
 const BestSeller = ({categoryData}) => {
     const [loading, setLoading] = useState(false);
     const [mainBanner,setMainBanner]=useState();
     const [products,setAllProducts] = useState();
     const [currentSlug,setCurrentSlug]= useState();
+    const ratingStars = [
+        { icon: star },
+        { icon: star },
+        { icon: star },
+        { icon: star },
+        { icon: star }
+    ]
+
     const getBestSellerProducts = async (slug) => {
         const api = `/api/v1/products/by-category?categorySlug=${slug}&best_selling_product=1`
         try {
@@ -63,10 +74,12 @@ const BestSeller = ({categoryData}) => {
     // const {products} = useProducts();
 
     const navigate = useNavigate()
-    
+    const {addSingleProduct} = useSingleProductContext();
+    const {addToCart} = useCart()
     const handleProductClick = (item) => {
-        navigate(`/single-product/${item.slug}`, { state: { products: item } });
-        console.log("Clicked on ", item.slug);
+        addSingleProduct(item)
+        addToCart(item)
+        navigate(`/single-product/${item.slug}`, {state: item})
     }
 
     const itemPerPage = 6
@@ -134,15 +147,17 @@ const BestSeller = ({categoryData}) => {
                     {!loading ? <div className='best-seller-slider' style={{ transform: `translateX(-${(currentIndex / maxIndex) * 0}%)` }}>
                         {products && products.slice(currentIndex, currentIndex + itemPerPage).map((item, index) => (
                             <BestSellerProductCard
-                                key={index}
-                                productData={item}
-                                productMainImage={item.image.image_url}
-                                starIcon={item.ratingStars}
-                                reviews={item.reviewCount}
-                                productName={item.name}
-                                oldPrice={item.regular_price}
-                                newPrice={item.sale_price} 
-                                handleCardClicked={() => handleProductClick(item)}
+                            productData={item}
+                            isDiscountable={item.discount.is_discountable === 1 ? true : false}
+                            key={index}
+                            productMainImage={item.images?.[0]?.image_url}
+                            starIcon={ratingStars}
+                            reviews={'200'}
+                            productName={item.name}
+                            oldPrice={item.regular_price}
+                            newPrice={item.newPrice}
+                            listed={false}
+                            handleCardClicked={() => handleProductClick(item)}
                             />
                         ))}
                     </div>:

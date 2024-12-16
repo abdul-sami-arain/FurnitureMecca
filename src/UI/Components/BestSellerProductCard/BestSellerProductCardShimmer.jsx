@@ -9,6 +9,9 @@ export default function BestSellerProductCardShimmer() {
             <div className="bestSellerCardNameShimmer">
 
             </div>
+            <div className="bestSellerCardNameShimmer">
+
+            </div>
             <div className="bestSellerCardPriceShimmer">
                 
              </div>

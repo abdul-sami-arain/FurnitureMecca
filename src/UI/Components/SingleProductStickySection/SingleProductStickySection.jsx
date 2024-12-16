@@ -52,6 +52,7 @@ import { useProductPage } from '../../../context/ProductPageContext/productPageC
 
 
 
+
 const SingleProductStickySection = ({ productData }) => {
 
   const {singleProductData,setSingleProductData,setSelectedVariationUid,findObjectByUID,setSelectedVariationData,selectedVariationData} = useProductPage();
@@ -95,7 +96,7 @@ const SingleProductStickySection = ({ productData }) => {
 
   const searchProductOnCart = cart.find((item) => item.product.uid === product.uid)
 
-  const [quantity, setQuantity] = useState(searchProductOnCart !== undefined ? searchProductOnCart.product.quantity : 1)
+  const [quantity, setQuantity] = useState(1)
   const increaseLocalQuantity = () => {
     setQuantity(quantity + 1);
   }
@@ -327,8 +328,11 @@ const SingleProductStickySection = ({ productData }) => {
 
   return (
     <>
-      <div className='sticky-main-container'>
+    
+      <div className='sticky-main-container-0'>
         {/* <Breadcrumb /> */}
+        {/* <Breadcrumb sku={productData?.sku} category={productData?.categories[0].name} categorySlug={productData?.categories[0].slug} /> */}
+        <div className="sticky-main-container">
         <div className='left-section'>
           <div className='single-product-alice-slider'>
             <p className='single-product-slider-main-image-stock-tag' >In Stock</p>
@@ -483,6 +487,7 @@ const SingleProductStickySection = ({ productData }) => {
             {/* <ProductOverView /> */}
             <SingleProductFAQ description={product.description} />
           </div>
+        </div>
         </div>
         <CartSidePannel
           cartData={cartProducts}

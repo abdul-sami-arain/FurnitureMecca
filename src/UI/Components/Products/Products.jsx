@@ -53,13 +53,14 @@ const Products = ({productArchiveHading}) => {
     const [addToCartClicked, setAddToCartClicked] = useState(false)
     const [quickViewClicked, setQuickView] = useState(false);
     const [products, setProducts] = useState([]);
-
+    const [categoryName,setCategoryName] = useState("");
     const fetchProductData = async () =>  {
         try {
             const response = await axios.get(`${url}/api/v1/products/by-category?categorySlug=${subCategorySlug}`);
             // Parse the JSON response
             const data = response.data.products;
             setProducts(data);
+            setCategoryName(response.data.categoryName);
             console.log("product archive data", response)
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -268,8 +269,8 @@ const Products = ({productArchiveHading}) => {
   return (
     <div className='products-main-container'>
         <Breadcrumb />
-        <h3 className='desktop-view-category-title'>Category: {productArchiveHading}</h3>
-        <p className='mobile-view-category-title'>{productArchiveHading}</p>
+        <h3 className='desktop-view-category-title'>{categoryName}</h3>
+        <p className='mobile-view-category-title'>{categoryName}</p>
 
         {/* Toggle section code */}
         <div className='toggle-sort-section'>

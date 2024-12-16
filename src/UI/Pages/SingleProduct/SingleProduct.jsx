@@ -27,6 +27,7 @@ import payPalMobileBanner from '../../../Assets/Furniture Mecca/Landing Page/sal
 import sixMonthCreditImage from '../../../Assets/Furniture Mecca/Landing Page/sale banner/download 122.png';
 import paymentOptionsBanner from '../../../Assets/Furniture Mecca/Landing Page/sale banner/Frame 4278.png'
 import { useSingleProductContext } from '../../../context/singleProductContext/singleProductContext'
+import Breadcrumb from '../../../Global-Components/BreadCrumb/BreadCrumb'
 
 const SingleProduct = () => {
 
@@ -61,6 +62,7 @@ const SingleProduct = () => {
 
   return (
     <div>
+      
         <SingleProductStickySection productData={product} />
         {product.collection && product.collection.length > 0 ? <SimillerProducts collection={product.collection} /> : <></>}
         {product.related_products && product.related_products.length > 0 ? <FrequentlyBought relatedProducts={product.related_products} /> : <></>}

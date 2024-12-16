@@ -16,32 +16,32 @@ const LatestModulerBanner = ({images, mobileMainImage, customWidth, mainImage, m
     <>
       <div className={`moduler-container ${customWidth ? 'show' : ''}`}>
         
-        <div className={`financing-banner`}>
+        {/* <div className={`financing-banner`}>
           <img src={PaypalBannerOne} alt="paypal banner" />
           <img src={PaypalBannerTwo} alt="paypal banner two" />
         </div>
         <div className='mobile-view-financing-banner'>
           <img src={MobileViewPaypalBanner} alt="paypal" />
-        </div>
-        <div className='installment-banner'>
+        </div> */}
+        {/* <div className='installment-banner'>
         <img src={installmentBanner} alt="instalment-plan banner" />
         </div>
         <div className='mobile-view-bed-banner'>
           <img src={mobileViewFullBed} alt="full bed" />
-        </div>
+        </div> */}
       </div>
       <div className={`full-width-container ${customWidth ? 'hide' : ''}`}>
         <div className={`dining-image-div ${mainImgShow ? 'show-main-img' : ''}`}>
           <img src={mainImage} alt='dining image' className='desktop-main-banner' />
           <img src={mobileMainImage} alt='mobile-main-image' className='mobile-main-banner' />
         </div>
-        <div className={`dining-paypal-div ${showBanners ? 'show-banners' : ''} ${paddingTop ? 'padding-top' : ''}`}>
+        {/* <div className={`dining-paypal-div ${showBanners ? 'show-banners' : ''} ${paddingTop ? 'padding-top' : ''}`}>
             <img src={PaypalBannerOne} alt='paypal one' />
             <img src={PaypalBannerTwo} alt='paypal two' />
         </div>
         <div className={`dining-installment-div ${showBanners ? 'show-banners' : ''}`}>
             <img src={installmentBanner} alt='installment' />
-        </div>
+        </div> */}
       </div>
     </>
   )

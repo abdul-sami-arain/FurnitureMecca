@@ -12,6 +12,7 @@
     gap: 10px;
     /* padding: 0 10px; */
     list-style: none;
+    
 }
 
 /* .bread-crumb-list li{
@@ -39,4 +40,18 @@
     ol li span{
         font-size: 8px;
     }
+}
+.bread_links_sub{
+    /* padding: 15px 10px; */
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+.bread_links :hover{
+ background-color:#F5F9FC ;
+ color: #4487C5;
+}
+
+.bread_links_sub.active{
+    color: #484F59;
+    font-weight: 600;
 }

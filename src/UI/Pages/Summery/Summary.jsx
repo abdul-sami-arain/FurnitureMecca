@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './Summary.css';
 import ShippingDetails from '../../Components/Summary-Components/ShippingDetails/ShippingDetails';
 import OrderSummary from '../../Components/Summary-Components/OrderSummary/OrderSummary';
@@ -11,6 +11,7 @@ import PaymentInfo from '../../Components/Summary-Components/PaymentInfo/Payment
 import { useMyOrders } from '../../../context/orderContext/ordersContext';
 import { useCart } from '../../../context/cartContext/cartContext';
 import Loader from '../../Components/Loader/Loader';
+import { GlobalContextProvider, useGlobalContext } from '../../../context/GlobalContext/globalContext';
 
 const Summary = () => {
 
@@ -21,31 +22,51 @@ const Summary = () => {
   ]
 
   const [currentId, setCurrentId] = useState(0)
-  const { 
-    setOrderPayload, 
-    orderPayload, 
-    handlePaymentInfo, 
-    addProducts, 
-    sendProducts, 
-    selectedTab, 
-    handleClickTop, 
-    handleTabOpen, 
-    isLoader, 
+  const {
+    setOrderPayload,
+    orderPayload,
+    handlePaymentInfo,
+    addProducts,
+    sendProducts,
+    selectedTab,
+    handleClickTop,
+    handleTabOpen,
+    isLoader,
+    setTaxLines
   } = useMyOrders();
 
-  const { cart } = useCart()
+  const { totalTax, setTaxValues } = useGlobalContext();
+  const { cart, cartProducts,subTotal } = useCart();
+
 
   const handleClickSave = () => {
-    addProducts(cart)
-    handlePaymentInfo()
-    sendProducts()
-  }
+    addProducts(cartProducts?.products);
+    handlePaymentInfo();
+    sendProducts();
+  };
+  
+  // UseEffect to check and fetch tax value if null
+  useEffect(() => {
+    if (totalTax === null) {
+      console.log("Tax value is null, fetching tax values...");
+      setTaxValues(); // Fetch tax values
+      setTaxLines(totalTax)
+    } else {
+      console.log("Here is the tax value:", totalTax);
+      setTaxLines(totalTax)
+    }
+  }, [totalTax, setTaxValues]);
+
+
+  
 
   const isPaymentMethodFilled = () => orderPayload.payment_method.trim() !== "";
 
-  const handleSubmit =  (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(orderPayload, "here is payment method details");
     if (isPaymentMethodFilled()) {
+
       // Proceed with form submission
       handleClickSave();
       // navigate('/')
@@ -73,24 +94,24 @@ const Summary = () => {
           ))}
         </div>
         {
-          selectedTab === 0 ? 
-          <div className='shipping-details-and-coupen-show'>
-            <ShippingDetails userInfoPayload={setOrderPayload} />
-            <Coupon />
-          </div> :
-          selectedTab === 1 ? 
-          <div className='order-summery-and-proceed-btn'>
-              <ShipingAndDelivery />
-              <PaymentInfo />
-              <OrderSummary />
-              <div className='order-summery-proceed-btn-div'>
-                <button onClick={()=> {handleTabOpen(2); handleClickTop(); addProducts(cart)}}>
-                  Continue to Payment
-                </button>
-              </div>
-          </div> : 
-          selectedTab === 2 ? <PaymentMethod handleSubmitOrder={handleSubmit} />
-          : <></>
+          selectedTab === 0 ?
+            <div className='shipping-details-and-coupen-show'>
+              <ShippingDetails userInfoPayload={setOrderPayload} />
+              <Coupon />
+            </div> :
+            selectedTab === 1 ?
+              <div className='order-summery-and-proceed-btn'>
+                <ShipingAndDelivery />
+                <PaymentInfo />
+                <OrderSummary />
+                <div className='order-summery-proceed-btn-div'>
+                  <button onClick={() => { handleTabOpen(2); handleClickTop(); addProducts(cartProducts) }}>
+                    Continue to Payment
+                  </button>
+                </div>
+              </div> :
+              selectedTab === 2 ? <PaymentMethod handleSubmitOrder={handleSubmit} />
+                : <></>
         }
       </div>
       <div className={` ${currentId === 1 ? 'summary-right-section' : currentId === 2 ? 'summery-right-section-according-payment' : 'summery-right-section-low-height'}`}>

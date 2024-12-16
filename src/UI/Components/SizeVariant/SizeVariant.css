@@ -41,7 +41,7 @@
     justify-self: start;
     flex-direction: column;
     gap: 5px;
-    width: 60px;
+    /* width: 60px; */
 }
 
 .attribute-color-variation-box{
